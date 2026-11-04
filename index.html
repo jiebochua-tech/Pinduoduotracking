@@ -17,16 +17,14 @@
     <style>
         /* CSS 色彩变量系统：实现浅色与深色无缝切换 */
         :root {
-            --bg-body: #F5F5FA;
-            --bg-card: #FFFFFF;
-            --bg-sub: #EEEDF9;
-            --bg-input: #F8FAFC;
-            --text-main: #1E1B4B;
-            --text-sub: #64748B;
-            --border-color: #E2E8F0;
-            --table-hover: #F1F5F9;
-            --modal-overlay: rgba(15, 23, 42, 0.4);
-        }
+    /* 从浅柔紫 ➡️ 浅迷幻粉 ➡️ 过渡回软白底色 */
+    --bg-body: linear-gradient(145deg, #EBE9FE 0%, #FCE7F3 30%, #F5F5FA 80%);
+    --bg-card: #FFFFFF;
+    --bg-sub: #F3E8FF;
+    --text-main: #1E1B4B;
+    --text-sub: #64748B;
+    --border-color: #E2E8F0;
+}
 
         html.dark {
             --bg-body: #0A0B10;
