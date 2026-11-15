@@ -1,1038 +1,1867 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拼多多网购记录4.5</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Flatpickr CSS & JS CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        /* CSS 色彩变量系统：实现浅色与深色无缝切换 */
-        :root {
-            /* 1. 浅色模式极光渐变背景：浅蓝 ➡️ 薄荷绿 ➡️ 柔软浅红 */
-            --bg-body: linear-gradient(145deg, #DCEEFB 0%, #E6F8F6 30%, #FFF1F2 80%);
-            --bg-card: #FFFFFF;
-            --bg-sub: #EBF4F6;
-            --bg-input: #F8FAFC;
-            --text-main: #0F172A;
-            --text-sub: #475569;
-            --border-color: #CBD5E1;
-            --table-hover: #F1F5F9;
-            --modal-overlay: rgba(15, 23, 42, 0.4);
-        }
-
-        html.dark {
-            /* 2. 深色模式背景 */
-            --bg-body: #0A0B10;
-            --bg-card: #14132B;
-            --bg-sub: #1C1947;
-            --bg-input: #0A0B10;
-            --text-main: #E2E8F0;
-            --text-sub: #94A3B8;
-            --border-color: rgba(49, 46, 129, 0.6);
-            --table-hover: rgba(139, 92, 246, 0.1);
-            --modal-overlay: rgba(2, 6, 23, 0.75);
-        }
-
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background: var(--bg-body); 
-            background-attachment: fixed; /* 锁定背景，防止长滚动断层 */
-            color: var(--text-main);
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8B5CF6; border-radius: 4px; }
-        .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
-        
-        .flatpickr-calendar {
-            background: var(--bg-card) !important;
-            border-radius: 1rem !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid var(--border-color) !important;
-            font-family: 'Inter', sans-serif !important;
-            color: var(--text-main) !important;
-        }
-        .flatpickr-day { color: var(--text-main) !important; }
-        .flatpickr-day.selected { background: linear-gradient(135deg, #8B5CF6, #EC4899) !important; border-color: transparent !important; color: #FFF !important; }
-        .flatpickr-months .flatpickr-month, .flatpickr-current-month .flatpickr-monthDropdown-months, span.flatpickr-weekday { color: var(--text-main) !important; fill: var(--text-main) !important; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多网盘索引管理系统 - 资源管理器风格</title>
+  <!-- 引入 Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 Lucide 图标库 -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* 辅助样式：隐藏折叠状态下的文本 */
+    .collapsed .nav-text,
+    .collapsed .nav-header {
+      display: none !important;
+    }
+    .collapsed .nav-item {
+      justify-content: center !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    /* 隐藏面包屑横向滚动条 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
-<body class="min-h-screen pb-16">
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col font-sans overflow-hidden select-none">
 
-    <!-- Toast Notification -->
-    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- 顶栏：Win11 资源管理器风格工具栏 -->
+  <header class="bg-white border-b border-slate-200 px-3 sm:px-4 py-2 flex items-center justify-between gap-2 sm:gap-3 shrink-0 shadow-sm">
+    <!-- 左侧：应用标识、返回上一级与可交互面包屑路径 -->
+    <div class="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+      <div class="flex items-center gap-2 pr-2 sm:pr-3 border-r border-slate-200 shrink-0">
+        <i data-lucide="hard-drive" class="w-6 h-6 text-indigo-600"></i>
+        <span class="font-bold text-slate-900 hidden md:inline text-sm">网盘资源管理器</span>
+      </div>
 
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
-
-        <!-- Top Header Bar -->
-        <header style="background-color: var(--bg-card); border-color: var(--border-color);" class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl shadow-lg border transition-all">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                    <!-- 拼多多官方 SVG Logo (严格匹配小写 images 目录，并带线上备用容错) -->
-                    <img src="images/pinduoduo-seeklogo.svg" 
-                         onerror="this.onerror=null; this.src='https://jiebochua-tech.github.io/Pinduoduotracking/images/pinduoduo-seeklogo.svg';" 
-                         alt="拼多多" 
-                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-contain shadow-sm shrink-0">
-                    <span>拼多多网购记录</span>
-                    <span class="text-xs bg-gradient-to-r from-violet-500/20 to-pink-500/20 text-pink-500 dark:text-pink-300 border border-pink-500/30 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                        <!-- Heroicon v1 outline: cloud -->
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                        云端同步
-                    </span>
-                </h1>
-                <div class="flex items-center gap-2 mt-3">
-                    <button id="navTab1" onclick="switchPage('records')" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: clipboard-list -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                        订单明细表
-                    </button>
-                    <button id="navTab2" onclick="switchPage('analytics')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all border opacity-80 hover:opacity-100 inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: chart-bar -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        月度理财统计
-                    </button>
-                </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="openFormModal()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-medium px-4 py-2.5 rounded-xl text-sm shadow-md shadow-purple-500/20 transition-all inline-flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: plus -->
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    新增网购订单
-                </button>
-                
-                <!-- 导出数据 Dropdown -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleExportMenu()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border font-medium px-4 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-1.5 hover:border-violet-500">
-                        <!-- Heroicon v1 outline: download -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        导出数据
-                    </button>
-                    <div id="exportMenu" style="background-color: var(--bg-card); border-color: var(--border-color);" class="hidden absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-xl shadow-2xl border focus:outline-none overflow-hidden">
-                        <button onclick="exportDataJSON(); toggleExportMenu()" style="border-color: var(--border-color);" class="w-full text-left px-4 py-3 text-sm hover:bg-violet-500/10 font-medium border-b flex items-center gap-2">
-                            <!-- Heroicon v1 outline: code -->
-                            <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                            JSON 备份
-                        </button>
-                        <button onclick="exportDataCSV(); toggleExportMenu()" class="w-full text-left px-4 py-3 text-sm hover:bg-violet-500/10 font-medium flex items-center gap-2">
-                            <!-- Heroicon v1 outline: table -->
-                            <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            CSV 表格
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- 导入备份按钮 -->
-                <label style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border font-medium px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer inline-flex items-center gap-1.5 hover:border-violet-500">
-                    <!-- Heroicon v1 outline: upload -->
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    导入备份
-                    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
-                </label>
-                
-                <!-- 设置按钮 -->
-                <div style="border-color: var(--border-color);" class="pl-3 border-l ml-1">
-                    <button onclick="openSettingsModal()" title="系统设置" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border p-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center hover:border-pink-500">
-                        <!-- Heroicon v1 outline: cog -->
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- 第 1 页：订单管理区域 -->
-        <div id="pageRecords" class="space-y-6">
-            <!-- Stats Dashboard -->
-            <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: currency-dollar -->
-                        <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        总网购支出
-                    </span>
-                    <div class="mt-2">
-                        <div class="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500" id="statTotalMYR">RM 0.00</div>
-                        <div style="color: var(--text-sub);" class="text-xs font-medium mt-0.5" id="statTotalRMB">¥ 0.00</div>
-                    </div>
-                </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: shopping-bag -->
-                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        订单总数量
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold" id="statTotalItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">笔记录</span>
-                    </div>
-                </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-amber-500">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: clock -->
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        待签收包裹
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-amber-500" id="statPendingItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">件在途</span>
-                    </div>
-                </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-emerald-500">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: check-circle -->
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        已签收包裹
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-emerald-500" id="statReceivedItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">件妥投</span>
-                    </div>
-                </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-sky-500 col-span-2 sm:col-span-1">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: collection -->
-                        <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        集包组数
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-sky-500" id="statDuplicateGroups">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">组重号</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Search & Filters -->
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-4 rounded-2xl border shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="relative w-full md:w-96">
-                    <!-- Heroicon v1 outline: search -->
-                    <svg style="color: var(--text-sub);" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" oninput="renderTable()" placeholder="搜索产品、订单号、快递单号..." style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-10 pr-4 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all">
-                </div>
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <label style="color: var(--text-sub);" class="text-sm font-medium whitespace-nowrap inline-flex items-center gap-1">
-                        <!-- Heroicon v1 outline: filter -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        筛选:
-                    </label>
-                    <select id="statusFilter" onchange="renderTable()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full md:w-44 px-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
-                        <option value="ALL">全部订单</option>
-                        <option value="PENDING">待签收</option>
-                        <option value="RECEIVED">已签收</option>
-                        <option value="BUNDLED">集包派送</option>
-                    </select>
-                    <button onclick="resetFilters()" class="text-xs text-pink-500 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
-                        <!-- Heroicon v1 outline: refresh -->
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        重置
-                    </button>
-                </div>
-            </section>
-
-            <!-- Table -->
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl border shadow-lg overflow-hidden">
-                <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead>
-                            <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs font-semibold uppercase tracking-wider">
-                                <th class="px-5 py-4">订单号 & 下单时间</th>
-                                <th class="px-5 py-4">商品名称 & 规格</th>
-                                <th class="px-5 py-4 text-right">价格 (RM/¥)</th>
-                                <th class="px-5 py-4">中国物流</th>
-                                <th class="px-5 py-4">马来西亚物流</th>
-                                <th class="px-5 py-4">状态</th>
-                                <th class="px-5 py-4 text-center">用时</th>
-                                <th class="px-5 py-4 text-center">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recordsTableBody" class="divide-y text-sm"></tbody>
-                    </table>
-                    <!-- Empty State -->
-                    <div id="emptyState" style="color: var(--text-sub);" class="hidden flex-col items-center justify-center py-16">
-                        <!-- Heroicon v1 outline: inbox -->
-                        <svg class="w-16 h-16 opacity-40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                        <p class="font-medium">暂无记录，或需登录后同步云端</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- 第 2 页：统计区域 -->
-        <div id="pageAnalytics" class="hidden space-y-6">
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-6 rounded-2xl border shadow-lg space-y-4">
-                <div style="border-color: var(--border-color);" class="flex justify-between border-b pb-4">
-                    <div>
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <!-- Heroicon v1 outline: presentation-chart-bar -->
-                            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                            月度网购支出趋势 (RM)
-                        </h2>
-                    </div>
-                    <div class="text-right">
-                        <span style="color: var(--text-sub);" class="text-xs">历史累计折合支出</span>
-                        <div class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500" id="analyticsTotalMYR">RM 0.00</div>
-                    </div>
-                </div>
-                <div class="relative w-full h-[380px] pt-2"><canvas id="monthlyExpenseChart"></canvas></div>
-            </section>
-        </div>
+      <!-- 返回上一级按钮 -->
+      <button id="upLevelBtn" onclick="goUpOneLevel()" disabled class="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:pointer-events-none transition-all shrink-0" title="返回上一级">
+        <i data-lucide="arrow-up" class="w-4 h-4"></i>
+      </button>
+      
+      <!-- 面包屑地址栏 (Breadcrumb) -->
+      <div id="breadcrumbContainer" class="flex items-center gap-1 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 min-w-0 flex-1 max-w-xl text-slate-600 overflow-x-auto whitespace-nowrap no-scrollbar">
+        <!-- 动态渲染层级面包屑 -->
+      </div>
     </div>
 
-    <!-- Modals -->
+    <!-- 右侧：搜索框、新建菜单与设置 -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- 搜索框 -->
+      <div class="relative w-24 sm:w-52 md:w-60">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="searchInput" oninput="renderFiles()" placeholder="搜索名称或备注..." class="w-full pl-8 pr-6 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5" title="清空搜索">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
 
-    <!-- 商品详情 Modal (Info Modal) -->
-    <div id="detailModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-xl overflow-hidden">
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-6 py-4 border-b flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                    <!-- Heroicon v1 outline: cube -->
-                    <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    订单详细信息
-                </h3>
-                <button onclick="closeDetailModal()" style="color: var(--text-sub);" class="hover:opacity-80">
-                    <!-- Heroicon v1 outline: x -->
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 text-sm">
-                <!-- 基本与价格 -->
-                <div style="background-color: var(--bg-input); border-color: var(--border-color);" class="p-4 rounded-xl border grid grid-cols-2 gap-3">
-                    <div><span style="color: var(--text-sub);" class="text-xs block">订单号</span><span id="detailOrderNum" class="font-mono font-bold text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">下单时间</span><span id="detailOrderTime" class="font-mono text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">价格 (RM)</span><span id="detailPriceMYR" class="font-bold text-violet-500">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">价格 (RMB)</span><span id="detailPriceRMB" class="font-mono text-xs">-</span></div>
-                </div>
-                <!-- 商品名称与规格 -->
-                <div>
-                    <span style="color: var(--text-sub);" class="text-xs block">商品名称</span>
-                    <div id="detailProductName" class="font-bold text-base mt-0.5">-</div>
-                    <div id="detailDescription" style="color: var(--text-sub);" class="text-xs mt-1">-</div>
-                </div>
-                <!-- 物流信息 -->
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3 rounded-xl border">
-                        <span class="text-xs font-semibold text-purple-400 flex items-center gap-1 mb-1">
-                            <!-- Heroicon v1 outline: truck -->
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                            中国物流 (CN)
-                        </span>
-                        <div id="detailCnCourier" class="font-medium text-xs">-</div>
-                        <div id="detailCnTracking" class="font-mono text-xs mt-0.5 break-all">-</div>
-                    </div>
-                    <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3 rounded-xl border">
-                        <span class="text-xs font-semibold text-pink-400 flex items-center gap-1 mb-1">
-                            <!-- Heroicon v1 outline: truck -->
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                            大马物流 (MY)
-                        </span>
-                        <div id="detailMyCourier" class="font-medium text-xs">-</div>
-                        <div id="detailMyTracking" class="font-mono text-xs mt-0.5 break-all">-</div>
-                    </div>
-                </div>
-                <!-- 备注与其他 -->
-                <div class="grid grid-cols-2 gap-3 pt-1">
-                    <div><span style="color: var(--text-sub);" class="text-xs block">签收时间</span><span id="detailReceivedTime" class="font-mono text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">备注</span><span id="detailRemarks" class="text-xs">-</span></div>
-                </div>
-            </div>
-            <!-- 弹窗底部操作区：修改商品与红底白字删除商品 -->
-            <div style="border-color: var(--border-color); background-color: var(--bg-sub);" class="px-6 py-4 border-t flex items-center justify-between">
-                <!-- 红底白字删除按钮 -->
-                <button onclick="deleteFromDetail()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: trash -->
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    删除商品
-                </button>
-                <div class="flex items-center gap-2">
-                    <button onclick="closeDetailModal()" style="background-color: var(--bg-card); border-color: var(--border-color);" class="border px-4 py-2 rounded-xl text-xs font-medium">关闭</button>
-                    <button onclick="editFromDetail()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: pencil-alt -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        修改商品
-                    </button>
-                </div>
-            </div>
+      <!-- 添加新建菜单按钮 -->
+      <div class="relative">
+        <button id="addDropdownBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-2.5 py-1.5 rounded-lg text-xs shadow-sm flex items-center gap-1 transition-all">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">新建</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <!-- 下拉菜单 -->
+        <div id="addDropdownMenu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-30">
+          <button onclick="openDriveModal()" class="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="hard-drive" class="w-4 h-4 text-indigo-500"></i>
+            添加网盘
+          </button>
+          <button onclick="openFolderModal()" class="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="folder-plus" class="w-4 h-4 text-amber-500"></i>
+            添加文件夹
+          </button>
+          <hr class="my-1 border-slate-100">
+          <button onclick="openFileModal()" class="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="file-plus-2" class="w-4 h-4 text-indigo-500"></i>
+            添加文件
+          </button>
         </div>
+      </div>
+
+      <!-- 设置按钮（含账号登录状态指示点） -->
+      <button onclick="openSettingsModal()" class="relative p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all" title="系统设置与账号">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span id="settingsAuthDot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white" title="未登录"></span>
+      </button>
     </div>
+  </header>
 
-    <!-- Add/Edit Record Modal -->
-    <div id="formModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-40 hidden flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-3xl overflow-hidden shrink-0">
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-6 py-4 border-b flex justify-between items-center">
-                <h3 id="modalTitle" class="text-lg font-bold">新增记录</h3>
-                <button onclick="closeFormModal()" style="color: var(--text-sub);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <form id="recordForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-5">
-                <input type="hidden" id="recordId">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">订单号</label><input type="text" id="orderNum" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">下单时间 *</label><input type="text" id="orderTime" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">签收时间</label><input type="text" id="receivedTime" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500"></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">产品名称 *</label><input type="text" id="productName" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">描述/规格</label><input type="text" id="description" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                </div>
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border">
-                    <div>
-                        <label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">价格 (¥)</label>
-                        <div class="relative"><span style="color: var(--text-sub);" class="absolute left-3 top-1/2 -translate-y-1/2">¥</span><input type="number" step="0.01" id="priceRMB" oninput="autoConvertCurrency()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-8 pr-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    </div>
-                    <div>
-                        <label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">价格 (RM) *</label>
-                        <div class="relative"><span style="color: var(--text-sub);" class="absolute left-3 top-1/2 -translate-y-1/2">RM</span><input type="number" step="0.01" id="priceMYR" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-10 pr-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    </div>
-                </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="flex items-center gap-1 text-xs font-medium mb-1 text-purple-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                            中国快递 (CN)
-                        </label>
-                        <input type="text" id="cnCourier" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
-                    </div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-medium mb-1">中国单号</label><input type="text" id="cnTracking" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-sans focus:ring-2 focus:ring-pink-500"></div>
-                </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="flex items-center gap-1 text-xs font-medium mb-1 text-pink-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
-                            大马快递 (MY)
-                        </label>
-                        <input type="text" id="myCourier" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
-                    </div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-medium mb-1">大马单号 (集包自动高亮)</label><input type="text" id="myTracking" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-sans focus:ring-2 focus:ring-pink-500"></div>
-                </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">备注</label><input type="text" id="remarks" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">其他</label><input type="text" id="other" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                </div>
-                <div style="border-color: var(--border-color);" class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" onclick="closeFormModal()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-5 py-2.5 rounded-xl text-sm border">取消</button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl text-sm text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 shadow-md font-medium inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: cloud-upload -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                        保存上传至云端
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+  <!-- 主内容区：左侧导航栏 + 右侧主工作区 -->
+  <div class="flex-1 flex overflow-hidden">
 
-    <!-- Mark Received Modal -->
-    <div id="markReceivedModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border max-w-md w-full p-6 space-y-4">
-            <h3 class="font-bold flex items-center gap-2">
-                <!-- Heroicon v1 outline: check-circle -->
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                确定标记签收此商品？
-            </h3>
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3.5 rounded-xl text-xs space-y-1 border">
-                <div class="flex justify-between"><span>订单号:</span><span id="markPreviewOrderNum" class="font-mono">-</span></div>
-                <div class="flex justify-between"><span>名称:</span><span id="markPreviewProductName" class="font-bold">-</span></div>
-                <div id="markBundledNotice" class="hidden text-[11px] text-pink-500 bg-violet-500/10 p-2 rounded-lg mt-1 border border-pink-500/30 flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: collection -->
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <span>包含同单号集包，将自动一并签收关联包裹。</span>
-                </div>
-            </div>
-            <div>
-                <label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">签收日期与时间</label>
-                <input type="text" id="markReceivedDateTimeInput" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2.5 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500">
-            </div>
-            <div class="flex justify-end gap-3 pt-2">
-                <button onclick="closeMarkReceivedModal()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-4 py-2 rounded-xl text-xs border">取消</button>
-                <button onclick="confirmMarkReceived()" class="px-5 py-2 rounded-xl text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-medium">确认签收</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal (包含主题设置、汇率设置与登录) -->
-    <div id="settingsModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-sm p-6 space-y-5">
-            <div style="border-color: var(--border-color);" class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                    <!-- Heroicon v1 outline: adjustments -->
-                    <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    系统设置
-                </h3>
-                <button onclick="closeSettingsModal()" style="color: var(--text-sub);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <div class="space-y-4">
-                <!-- 1. 外观主题设置 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-2">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: color-swatch -->
-                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-                        外观主题
-                    </label>
-                    <select id="themeSelect" onchange="changeTheme(this.value)" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
-                        <option value="system">跟随系统 (System)</option>
-                        <option value="dark">深色模式 (Dark)</option>
-                        <option value="light">浅色模式 (Light)</option>
-                    </select>
-                </div>
-
-                <!-- 2. 人民币兑马币汇率设置 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-2">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: currency-dollar -->
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        默认汇率 (1 RMB = ? MYR)
-                    </label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" step="0.001" id="exchangeRateInput" onchange="updateExchangeRate(this.value)" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono outline-none focus:ring-2 focus:ring-pink-500" placeholder="0.65">
-                        <span style="color: var(--text-sub);" class="text-xs font-bold whitespace-nowrap">RM/¥</span>
-                    </div>
-                    <span style="color: var(--text-sub);" class="text-[11px] block">修改后自动作用于新创建订单的汇率自动换算。</span>
-                </div>
-
-                <!-- 3. 云同步账号 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-3">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: cloud -->
-                        <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                        账号云同步
-                    </label>
-                    <div class="flex flex-col gap-3">
-                        <div id="user-info" class="text-[13px] font-medium text-pink-500 hidden text-center bg-violet-500/10 py-1.5 rounded-lg border border-pink-500/30"></div>
-                        <button id="login-btn" onclick="loginWithGoogle(); closeSettingsModal()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full border px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                            Google 账号登录
-                        </button>
-                        <button id="logout-btn" onclick="logoutGoogle(); closeSettingsModal()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full border px-4 py-2.5 rounded-xl text-sm hidden transition-colors inline-flex items-center justify-center gap-1.5">
-                            <!-- Heroicon v1 outline: logout -->
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            退出当前账号
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase 云端服务逻辑 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-oWWKpHwueHLK-u4fLTbYL3BqSHekcMU",
-            authDomain: "pinduoduo-tracking.firebaseapp.com",
-            projectId: "pinduoduo-tracking",
-            storageBucket: "pinduoduo-tracking.firebasestorage.app",
-            messagingSenderId: "968673464772",
-            appId: "1:968673464772:web:f262b5a6a7f649347c1491",
-            measurementId: "G-MZ4410HJX1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+    <!-- 左侧导航栏 (支持收起/展开，全设备通用) -->
+    <aside id="sidebar" class="w-60 bg-slate-50 border-r border-slate-200 p-2 sm:p-3 flex flex-col justify-between overflow-y-auto shrink-0 transition-all duration-300 ease-in-out">
+      <div class="space-y-4">
         
-        window.currentUser = null;
+        <!-- 折叠控制顶栏 (放置 < 与 > 按钮) -->
+        <div class="flex items-center justify-between px-1 mb-1">
+          <span class="nav-header text-[11px] font-semibold text-slate-400 uppercase tracking-wider">导航目录</span>
+          <button id="toggleSidebarBtn" onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-slate-200/70 text-slate-500 hover:text-indigo-600 transition-all mx-auto" title="展开/折叠侧边栏">
+            <i id="toggleSidebarIcon" data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+        </div>
 
-        window.loginWithGoogle = () => signInWithPopup(auth, provider);
-        window.logoutGoogle = () => signOut(auth);
+        <!-- 主视图列表 -->
+        <div>
+          <div class="nav-header text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 mb-1.5">快速访问</div>
+          <nav class="space-y-1">
+            <button id="navAllFiles" onclick="filterByDrive(null, null)" title="全部文件" class="nav-item w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-600 transition-all">
+              <i data-lucide="files" class="w-4 h-4 shrink-0"></i>
+              <span class="nav-text truncate">全部文件</span>
+            </button>
+            <button id="navDriveMgmt" onclick="switchMainTab('drives')" title="网盘管理页" class="nav-item w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-200/60 transition-all">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+              <span class="nav-text truncate">网盘管理页</span>
+            </button>
+          </nav>
+        </div>
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                window.currentUser = user;
-                document.getElementById('login-btn').classList.add('hidden');
-                document.getElementById('logout-btn').classList.remove('hidden');
-                document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('user-info').innerText = user.email;
+        <!-- 已注册网盘树形列表 -->
+        <div>
+          <div class="nav-header flex items-center justify-between px-2 mb-1.5">
+            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">已挂载网盘</span>
+            <button onclick="openDriveModal()" class="text-slate-400 hover:text-indigo-600" title="添加网盘"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <nav id="sidebarDriveList" class="space-y-1">
+            <!-- JS 动态渲染网盘树状列表 -->
+          </nav>
+        </div>
+      </div>
 
-                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-                    if (docSnap.exists()) {
-                        window.records = docSnap.data().records || [];
-                    } else {
-                        window.records = [];
-                    }
-                    if(window.renderTable) window.renderTable();
-                });
-            } else {
-                window.currentUser = null;
-                window.records = [];
-                document.getElementById('login-btn').classList.remove('hidden');
-                document.getElementById('logout-btn').classList.add('hidden');
-                document.getElementById('user-info').classList.add('hidden');
-                if(window.renderTable) window.renderTable();
-                window.showToast("未登录：请登录 Google 账号以同步云端数据", "info");
-            }
+      <!-- 底部系统提示 -->
+      <div class="nav-header pt-3 border-t border-slate-200 text-[11px] text-slate-400 px-2 flex items-center gap-1.5">
+        <i id="sidebarModeIcon" data-lucide="lock" class="w-3.5 h-3.5 shrink-0 text-amber-500"></i>
+        <span id="sidebarModeText" class="nav-text">请先登录云端账号</span>
+      </div>
+    </aside>
+
+    <!-- 右侧工作区 -->
+    <main class="flex-1 bg-white overflow-y-auto flex flex-col min-w-0">
+
+      <!-- 视图 1：文件与文件夹混合列表视图 (Win11 File List UI) -->
+      <div id="viewFiles" class="flex-1 flex flex-col">
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse min-w-[580px]">
+            <thead>
+              <tr class="border-b border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-500">
+                <th class="py-2.5 px-4 font-semibold">Name (名称)</th>
+                <th class="py-2.5 px-4 font-semibold w-32 sm:w-36">Type (类型)</th>
+                <th class="py-2.5 px-4 font-semibold w-24 sm:w-28">Size (大小)</th>
+                <th class="py-2.5 px-4 font-semibold w-36 sm:w-48">文件备注</th>
+                <th class="py-2.5 px-4 font-semibold w-20 sm:w-24 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="fileTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+              <!-- 动态渲染文件夹与文件记录 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 底部状态栏 (Status Bar) -->
+        <footer class="h-8 border-t border-slate-200 bg-slate-50 px-4 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
+          <div id="statusBarCount">0 个项目</div>
+          <div id="statusBarSelected" class="hidden sm:block">点击文件夹可进入查看内部文件</div>
+        </footer>
+      </div>
+
+      <!-- 视图 2：网盘管理视图 (Dashboard UI) -->
+      <div id="viewDrives" class="hidden p-4 sm:p-6 space-y-6 flex-1">
+        <!-- 统计指标卡片组 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4">
+            <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg">
+              <i data-lucide="hard-drive" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase">已注册网盘</p>
+              <h3 id="statDrives" class="text-xl font-bold text-slate-800 mt-0.5">0 个</h3>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4">
+            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+              <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase">已索引文件</p>
+              <h3 id="statFiles" class="text-xl font-bold text-slate-800 mt-0.5">0 个</h3>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-4">
+            <div class="p-3 bg-amber-100 text-amber-600 rounded-lg">
+              <i data-lucide="pie-chart" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase">统计体积</p>
+              <h3 id="statSize" class="text-xl font-bold text-slate-800 mt-0.5">0 B</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- 网盘清单表格 -->
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="server" class="w-4 h-4 text-indigo-600"></i>
+              网盘挂载配置
+            </h2>
+            <button onclick="openDriveModal()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-lg transition-all flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              添加网盘
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-xs font-medium text-slate-500">
+                  <th class="py-3 px-4">网盘名称</th>
+                  <th class="py-3 px-4">文件夹数量</th>
+                  <th class="py-3 px-4">关联文件数</th>
+                  <th class="py-3 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody id="driveTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+                <!-- 动态渲染 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- 隐藏的 JSON 备份文件选择器 -->
+  <input type="file" id="importJsonInput" accept=".json,application/json" class="hidden" onchange="handleImportJsonFile(event)" />
+
+  <!-- 模态框：系统设置弹窗 -->
+  <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-indigo-600"></i>
+          系统设置
+        </h3>
+        <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Google 账号与云端同步 -->
+        <div class="pb-3.5 border-b border-slate-100">
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">云端账号</label>
+
+          <!-- 未登录状态 -->
+          <div id="settingsLoggedOutView" class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <i data-lucide="cloud-off" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-slate-800">未登录 Google 账号</p>
+                <p class="text-[11px] text-slate-500 truncate">登录后开启多端实时云同步</p>
+              </div>
+            </div>
+            <button id="googleLoginBtn" type="button" onclick="loginWithGoogle()" class="w-full py-2 px-3 rounded-xl border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-700 font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-xs">
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"/>
+                <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"/>
+              </svg>
+              <span>使用 Google 账号登录</span>
+            </button>
+          </div>
+
+          <!-- 已登录状态 -->
+          <div id="settingsLoggedInView" class="hidden bg-emerald-50/60 border border-emerald-200 rounded-xl p-3.5 space-y-3">
+            <div class="flex items-center gap-2.5">
+              <img id="userAvatarImg" src="" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-white shadow-xs hidden shrink-0" />
+              <div id="userAvatarFallback" class="w-9 h-9 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0">G</div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-1.5">
+                  <p id="userDisplayName" class="text-xs font-bold text-slate-800 truncate">Google 用户</p>
+                  <span id="syncBadgeText" class="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-semibold shrink-0">实时同步</span>
+                </div>
+                <p id="userEmailText" class="text-[11px] text-slate-500 truncate mt-0.5">user@gmail.com</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-emerald-200/70">
+              <div class="flex items-center gap-1.5 text-[11px] text-emerald-700">
+                <i data-lucide="radio" class="w-3.5 h-3.5 shrink-0"></i>
+                <span id="lastSyncTimeText">Cloud Firestore 实时连接</span>
+              </div>
+              <button type="button" onclick="logoutGoogle()" class="px-2.5 py-1 text-xs text-rose-600 hover:bg-rose-100/80 rounded-lg flex items-center gap-1 transition-colors font-semibold shrink-0">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                <span>退出登录</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 文件后缀名管理 -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1.5">文件后缀名管理</label>
+          <select id="extManagementSelect" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white">
+            <option value="auto">自动识别扩展名 (默认)</option>
+            <option value="custom">自定义映射分类 (预留功能)</option>
+            <option value="ignore">忽略无扩展名文件 (预留功能)</option>
+          </select>
+          <p class="text-[11px] text-slate-400 mt-1.5">说明：此下拉选项为预留界面控件，暂无实际功能。</p>
+        </div>
+
+        <!-- 导入/导出备份下拉折叠选项 -->
+        <div class="pt-3 border-t border-slate-100">
+          <div class="border border-slate-200 bg-slate-50/70 rounded-xl overflow-hidden">
+            <button type="button" onclick="toggleBackupZone()" class="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 hover:bg-slate-100/80 transition-colors">
+              <span class="flex items-center gap-1.5">
+                <i data-lucide="database" class="w-4 h-4 text-indigo-600"></i>
+                <span>导入/导出备份</span>
+              </span>
+              <i id="backupZoneChevron" data-lucide="chevron-down" class="w-4 h-4 text-slate-500 transition-transform duration-200"></i>
+            </button>
+            <div id="backupZoneContent" class="hidden px-3.5 pb-3.5 pt-2.5 border-t border-slate-200 bg-white space-y-3">
+              <!-- 导出备份 -->
+              <div>
+                <div class="text-[11px] font-semibold text-slate-500 mb-1.5">导出备份</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" onclick="exportBackupJson()" class="py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>导出JSON</span>
+                  </button>
+                  <button type="button" onclick="exportBackupCsv()" class="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                    <span>导出CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 导入备份 -->
+              <div class="pt-2 border-t border-slate-100">
+                <div class="text-[11px] font-semibold text-slate-500 mb-1.5">导入备份</div>
+                <button type="button" onclick="triggerImportJson()" class="w-full py-2 px-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-all">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                  <span>导入JSON</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 危险区下拉折叠选项 -->
+        <div class="pt-1">
+          <div class="border border-rose-400 bg-rose-50/80 rounded-xl overflow-hidden shadow-sm shadow-rose-500/5">
+            <button type="button" onclick="toggleDangerZone()" class="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-rose-600 hover:bg-rose-100/80 transition-colors">
+              <span class="flex items-center gap-1.5">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                <span>危险区</span>
+              </span>
+              <i id="dangerZoneChevron" data-lucide="chevron-down" class="w-4 h-4 text-rose-600 transition-transform duration-200"></i>
+            </button>
+            <div id="dangerZoneContent" class="hidden px-3.5 pb-3.5 pt-2.5 border-t border-rose-200 bg-rose-50 space-y-2.5">
+              <p class="text-[11px] text-rose-600 leading-relaxed">
+                高危操作：执行清空将永久删除云端所有网盘、文件夹及文件索引数据。
+              </p>
+              <button type="button" onclick="openClearDataConfirm()" class="w-full py-2 px-3 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-lg shadow-sm shadow-rose-600/30 flex items-center justify-center gap-1.5 transition-all">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span>删除已有的数据</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('settingsModal')" class="px-4 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：导入 JSON 三选项确认弹窗 -->
+  <div id="importConfirmModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative border border-slate-200">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="p-2.5 bg-amber-100 text-amber-600 rounded-xl shrink-0">
+          <i data-lucide="alert-circle" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900">导入备份确认</h3>
+          <p id="importSummaryText" class="text-[11px] text-slate-500">已解析备份文件</p>
+        </div>
+      </div>
+
+      <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 mb-5 text-xs text-slate-700 leading-relaxed">
+        <p class="font-semibold text-amber-900 mb-1">这举动将把原有数据覆盖，是否继续？</p>
+        <p class="text-[11px] text-slate-600">
+          选择<strong class="text-rose-600">“继续”</strong>将清空并覆盖当前云端所有数据；选择<strong class="text-indigo-600">“添加内容”</strong>将保留原有数据并合并导入（重名网盘或同目录重名文件将自动编号）。
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2">
+        <button type="button" onclick="cancelImportBackup()" class="px-3.5 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
+          取消
+        </button>
+        <button type="button" onclick="executeImportAppend()" class="px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm transition-all">
+          添加内容
+        </button>
+        <button type="button" onclick="executeImportOverwrite()" class="px-3.5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm transition-all">
+          继续
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：清空数据红色警示二次确认弹窗 -->
+  <div id="clearDataConfirmModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-rose-500 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="p-2.5 bg-rose-100 text-rose-600 rounded-xl shrink-0">
+          <i data-lucide="shield-alert" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-rose-600">确认删除已有的数据？</h3>
+          <p class="text-[11px] font-semibold text-rose-500">危险操作 · 无法恢复</p>
+        </div>
+      </div>
+
+      <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-5 text-xs text-rose-800 leading-relaxed">
+        此操作将立即清空云端<strong class="font-bold text-rose-600">所有已注册网盘、文件夹层级及文件索引</strong>。清空后数据将无法找回，确定要继续吗？
+      </div>
+
+      <div class="flex justify-end gap-2.5">
+        <button type="button" onclick="closeModal('clearDataConfirmModal')" class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
+          取消
+        </button>
+        <button type="button" onclick="confirmClearAllData()" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-xl shadow-md shadow-rose-600/30 flex items-center gap-1.5 transition-all">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <span>确认删除</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框 1：添加网盘 -->
+  <div id="driveModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <h3 class="text-base font-bold text-slate-900 mb-4">添加网盘</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">网盘名称</label>
+          <input type="text" id="driveNameInput" placeholder="例: Google Drive #1" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeModal('driveModal')" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+        <button onclick="saveDrive()" class="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框 2：添加/编辑文件夹 -->
+  <div id="folderModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <h3 id="folderModalTitle" class="text-base font-bold text-slate-900 mb-4">添加文件夹</h3>
+      <input type="hidden" id="editFolderId">
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">目标网盘</label>
+          <select id="folderDriveSelect" onchange="updateFolderParentOptions()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">父级文件夹</label>
+          <select id="folderParentSelect" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">文件夹名称</label>
+          <input type="text" id="folderNameInput" placeholder="例: Documents" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeModal('folderModal')" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+        <button onclick="saveFolder()" class="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框 3：添加/编辑文件 -->
+  <div id="fileModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <h3 id="fileModalTitle" class="text-base font-bold text-slate-900 mb-4">添加文件</h3>
+      <input type="hidden" id="editFileId">
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">文件名 (含后缀)</label>
+          <input type="text" id="fileNameInput" placeholder="例: report.pdf" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">文件体积</label>
+          <input type="text" id="fileSizeInput" placeholder="例: 15.5 MB" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">所属网盘</label>
+          <select id="fileDriveSelect" onchange="updateFileFolderOptions()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">存放路径</label>
+          <select id="fileFolderSelect" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">文件备注 (选填)</label>
+          <input type="text" id="fileNoteInput" placeholder="例: 2026年度最终版备份" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeModal('fileModal')" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+        <button onclick="saveFile()" class="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全局 Toast 悬浮通知容器 -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[80] flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm w-full"></div>
+
+  <!-- 核心应用脚本 -->
+  <script>
+    // 数据状态（强制登录模式：仅登录后由云端实时同步填充）
+    let drives = [];
+    let folders = [];
+    let files = [];
+    window.currentUser = null;
+
+    // 当前视图与层级导航状态
+    let currentMainTab = 'files'; // 'files' | 'drives'
+    let currentSelectedDriveId = null; // null 代表所有网盘根目录
+    let currentSelectedFolderId = null; // null 代表当前网盘根目录
+    let isSidebarCollapsed = false;
+
+    // 待处理的导入备份暂存数据
+    let pendingBackupData = null;
+
+    // HTML 转义助手
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // 全局 Toast 通知方法
+    window.showToast = function(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const styles = {
+        success: {
+          bg: 'bg-emerald-600 text-white border-emerald-500',
+          icon: 'check-circle-2'
+        },
+        error: {
+          bg: 'bg-rose-600 text-white border-rose-500',
+          icon: 'alert-circle'
+        },
+        warning: {
+          bg: 'bg-amber-500 text-white border-amber-400',
+          icon: 'alert-triangle'
+        },
+        info: {
+          bg: 'bg-slate-800 text-white border-slate-700',
+          icon: 'info'
+        }
+      };
+
+      const cfg = styles[type] || styles.info;
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl shadow-lg border text-xs font-medium transition-all duration-300 transform translate-x-full opacity-0 ${cfg.bg}`;
+      toast.innerHTML = `
+        <i data-lucide="${cfg.icon}" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <span class="flex-1 leading-relaxed break-words">${escapeHtml(message)}</span>
+        <button type="button" class="opacity-75 hover:opacity-100 shrink-0 p-0.5" aria-label="关闭">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      `;
+
+      const dismiss = () => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      };
+
+      toast.querySelector('button').addEventListener('click', dismiss);
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+      });
+
+      setTimeout(dismiss, 3200);
+    };
+
+    // 强制登录守卫
+    function requireAuth() {
+      if (!window.currentUser) {
+        window.showToast('请先登录 Google 账号！', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    // 生成唯一 ID
+    function generateUniqueId() {
+      return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    }
+
+    // 全量刷新界面渲染
+    window.renderAll = function() {
+      renderSidebarDrives();
+      renderBreadcrumb();
+      renderStats();
+      renderFiles();
+      renderDriveTable();
+    };
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      window.renderAll();
+      initDropdown();
+    });
+
+    // 切换侧边栏折叠/展开
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const icon = document.getElementById('toggleSidebarIcon');
+
+      isSidebarCollapsed = !isSidebarCollapsed;
+
+      if (isSidebarCollapsed) {
+        sidebar.classList.remove('w-60');
+        sidebar.classList.add('w-14', 'collapsed');
+        icon.setAttribute('data-lucide', 'chevron-right');
+      } else {
+        sidebar.classList.remove('w-14', 'collapsed');
+        sidebar.classList.add('w-60');
+        icon.setAttribute('data-lucide', 'chevron-left');
+      }
+
+      lucide.createIcons();
+    }
+
+    // 保存并实时推送至云端
+    function syncStorage() {
+      if (!requireAuth()) return false;
+      window.renderAll();
+      if (typeof window.saveRecordsToCloud === 'function') {
+        window.saveRecordsToCloud();
+      }
+      return true;
+    }
+
+    // 初始化下拉控制
+    function initDropdown() {
+      const btn = document.getElementById('addDropdownBtn');
+      const menu = document.getElementById('addDropdownMenu');
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', () => {
+        menu.classList.add('hidden');
+      });
+    }
+
+    // 打开系统设置弹窗（默认折叠导入/导出与危险区子面板）
+    function openSettingsModal() {
+      document.getElementById('backupZoneContent').classList.add('hidden');
+      document.getElementById('backupZoneChevron').classList.remove('rotate-180');
+      document.getElementById('dangerZoneContent').classList.add('hidden');
+      document.getElementById('dangerZoneChevron').classList.remove('rotate-180');
+      openModal('settingsModal');
+    }
+
+    // 展开/收起设置中的“导入/导出备份”
+    function toggleBackupZone() {
+      const content = document.getElementById('backupZoneContent');
+      const chevron = document.getElementById('backupZoneChevron');
+      content.classList.toggle('hidden');
+      chevron.classList.toggle('rotate-180');
+    }
+
+    // 展开/收起设置中的“危险区”
+    function toggleDangerZone() {
+      const content = document.getElementById('dangerZoneContent');
+      const chevron = document.getElementById('dangerZoneChevron');
+      content.classList.toggle('hidden');
+      chevron.classList.toggle('rotate-180');
+    }
+
+    // ==========================================
+    // 导入 / 导出备份与合并引擎
+    // ==========================================
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function getDateStamp() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // 1. 导出 JSON 完整备份
+    function exportBackupJson() {
+      if (!requireAuth()) return;
+      const payload = {
+        app: '多网盘索引管理系统',
+        version: '2.0',
+        exportedAt: new Date().toISOString(),
+        drives: drives,
+        folders: folders,
+        files: files
+      };
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      triggerDownload(blob, `multidrive-backup-${getDateStamp()}.json`);
+      window.showToast('JSON 备份文件已导出', 'success');
+    }
+
+    // 2. 导出 CSV 扁平报表（带 UTF-8 BOM）
+    function exportBackupCsv() {
+      if (!requireAuth()) return;
+      const escapeCsv = (val) => {
+        const str = val == null ? '' : String(val);
+        if (/[",\r\n]/.test(str)) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const headers = ['名称', '类型', '大小', '存储路径', '文件备注'];
+      const rows = [headers.map(escapeCsv).join(',')];
+
+      folders.forEach(folder => {
+        const row = [
+          folder.name,
+          'File folder',
+          '-',
+          getFullFolderPath(folder),
+          '-'
+        ];
+        rows.push(row.map(escapeCsv).join(','));
+      });
+
+      files.forEach(file => {
+        const row = [
+          file.name,
+          getFileCategory(file.name),
+          file.size || '-',
+          getFullFilePath(file),
+          file.note || ''
+        ];
+        rows.push(row.map(escapeCsv).join(','));
+      });
+
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      triggerDownload(blob, `multidrive-export-${getDateStamp()}.csv`);
+      window.showToast('CSV 表格已导出', 'success');
+    }
+
+    // 3. 唤起 JSON 文件选择
+    function triggerImportJson() {
+      if (!requireAuth()) return;
+      const input = document.getElementById('importJsonInput');
+      input.value = '';
+      input.click();
+    }
+
+    // 4. 读取并校验上传的 JSON 备份
+    function handleImportJsonFile(event) {
+      if (!requireAuth()) return;
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (
+            !parsed ||
+            !Array.isArray(parsed.drives) ||
+            !Array.isArray(parsed.folders) ||
+            !Array.isArray(parsed.files)
+          ) {
+            window.showToast('无效的备份文件格式，请选择本系统导出的 JSON 文件', 'error');
+            return;
+          }
+
+          pendingBackupData = {
+            drives: parsed.drives,
+            folders: parsed.folders,
+            files: parsed.files
+          };
+
+          document.getElementById('importSummaryText').innerText =
+            `包含 ${parsed.drives.length} 个网盘、${parsed.folders.length} 个文件夹、${parsed.files.length} 个文件`;
+
+          openModal('importConfirmModal');
+        } catch (err) {
+          window.showToast('JSON 文件解析失败，请检查文件是否损坏', 'error');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function cancelImportBackup() {
+      pendingBackupData = null;
+      closeModal('importConfirmModal');
+    }
+
+    // 规范化数据集结构
+    function normalizeDataset(rawData) {
+      const normDrives = (rawData.drives || []).map(d => ({
+        id: String(d.id || generateUniqueId()),
+        name: String(d.name || '未命名网盘')
+      }));
+      const validDriveIds = new Set(normDrives.map(d => d.id));
+
+      const normFolders = (rawData.folders || [])
+        .filter(f => validDriveIds.has(String(f.driveId)))
+        .map(f => ({
+          id: String(f.id || generateUniqueId()),
+          driveId: String(f.driveId),
+          parentId: f.parentId ? String(f.parentId) : null,
+          name: String(f.name || '未命名文件夹')
+        }));
+      const validFolderIds = new Set(normFolders.map(f => f.id));
+
+      const normFiles = (rawData.files || [])
+        .filter(f => validDriveIds.has(String(f.driveId)))
+        .map(f => ({
+          id: String(f.id || generateUniqueId()),
+          name: String(f.name || '未命名文件'),
+          size: f.size ? String(f.size) : '',
+          driveId: String(f.driveId),
+          folderId: (f.folderId && validFolderIds.has(String(f.folderId))) ? String(f.folderId) : null,
+          note: f.note ? String(f.note) : ''
+        }));
+
+      return { drives: normDrives, folders: normFolders, files: normFiles };
+    }
+
+    // 覆盖现有数据（点击“继续”）
+    function executeImportOverwrite() {
+      if (!requireAuth()) return;
+      if (!pendingBackupData) return;
+
+      const normalized = normalizeDataset(pendingBackupData);
+      drives = normalized.drives;
+      folders = normalized.folders;
+      files = normalized.files;
+
+      pendingBackupData = null;
+      currentSelectedDriveId = null;
+      currentSelectedFolderId = null;
+      document.getElementById('searchInput').value = '';
+
+      closeModal('importConfirmModal');
+      closeModal('settingsModal');
+      switchMainTab('files');
+      if (syncStorage()) {
+        window.showToast('备份数据已覆盖并同步至云端', 'success');
+      }
+    }
+
+    // 获取不重名的网盘名称（重名则自动追加 #1, #2...）
+    function getUniqueDriveName(baseName, targetDriveList) {
+      const existingNames = new Set(targetDriveList.map(d => d.name));
+      if (!existingNames.has(baseName)) return baseName;
+      let counter = 1;
+      while (existingNames.has(`${baseName} #${counter}`)) {
+        counter++;
+      }
+      return `${baseName} #${counter}`;
+    }
+
+    // 获取同一文件夹内不重名的文件名称（重名则自动追加 #1, #2...）
+    function getUniqueFileName(baseName, driveId, folderId, targetFileList) {
+      const normalizedFolderId = folderId || null;
+      const existingNames = new Set(
+        targetFileList
+          .filter(f => f.driveId === driveId && (f.folderId || null) === normalizedFolderId)
+          .map(f => f.name)
+      );
+      if (!existingNames.has(baseName)) return baseName;
+      let counter = 1;
+      while (existingNames.has(`${baseName} #${counter}`)) {
+        counter++;
+      }
+      return `${baseName} #${counter}`;
+    }
+
+    // 合并添加数据（点击“添加内容”）
+    function executeImportAppend() {
+      if (!requireAuth()) return;
+      if (!pendingBackupData) return;
+
+      const updatedDrives = [...drives];
+      const updatedFolders = [...folders];
+      const updatedFiles = [...files];
+
+      const driveIdMap = new Map();
+      const folderIdMap = new Map();
+
+      (pendingBackupData.drives || []).forEach(d => {
+        const oldId = String(d.id);
+        const newId = generateUniqueId();
+        driveIdMap.set(oldId, newId);
+
+        const rawName = String(d.name || '未命名网盘').trim() || '未命名网盘';
+        const uniqueName = getUniqueDriveName(rawName, updatedDrives);
+        updatedDrives.push({ id: newId, name: uniqueName });
+      });
+
+      const validImportedFolders = (pendingBackupData.folders || []).filter(f => driveIdMap.has(String(f.driveId)));
+      validImportedFolders.forEach(f => {
+        folderIdMap.set(String(f.id), generateUniqueId());
+      });
+
+      validImportedFolders.forEach(f => {
+        const newId = folderIdMap.get(String(f.id));
+        const newDriveId = driveIdMap.get(String(f.driveId));
+        const newParentId = (f.parentId && folderIdMap.has(String(f.parentId)))
+          ? folderIdMap.get(String(f.parentId))
+          : null;
+
+        updatedFolders.push({
+          id: newId,
+          driveId: newDriveId,
+          parentId: newParentId,
+          name: String(f.name || '未命名文件夹').trim() || '未命名文件夹'
         });
+      });
 
-        window.saveRecords = function() {
-            if (!window.currentUser) {
-                window.showToast("请先登录 Google 账号！", "error");
-                return;
-            }
-            setDoc(doc(db, "users", window.currentUser.uid), {
-                records: window.records
-            }).catch(error => {
-                console.error("云端同步失败:", error);
-                window.showToast("云同步失败，请检查网络", "error");
-            });
-        };
-    </script>
+      (pendingBackupData.files || []).forEach(f => {
+        const newDriveId = driveIdMap.get(String(f.driveId));
+        if (!newDriveId) return;
 
-    <!-- UI 与业务逻辑 -->
-    <script>
-        window.records = [];
-        let recordToDeleteId = null;
-        let recordToMarkReceivedId = null;
-        let currentDetailRecordId = null;
-        let expenseChartInstance = null;
-        let fpOrderTime = null, fpReceivedTime = null, fpMarkReceivedTime = null;
+        const newFolderId = (f.folderId && folderIdMap.has(String(f.folderId)))
+          ? folderIdMap.get(String(f.folderId))
+          : null;
 
-        // 全局汇率变量（默认 0.65，优先读取本地存储）
-        window.RMB_TO_MYR_RATE = parseFloat(localStorage.getItem('pdd_exchange_rate')) || 0.65;
+        const rawFileName = String(f.name || '未命名文件').trim() || '未命名文件';
+        const uniqueFileName = getUniqueFileName(rawFileName, newDriveId, newFolderId, updatedFiles);
 
-        document.addEventListener('DOMContentLoaded', () => { 
-            initFlatpickrPickers(); 
-            initTheme();
-            document.getElementById('exchangeRateInput').value = window.RMB_TO_MYR_RATE;
+        updatedFiles.push({
+          id: generateUniqueId(),
+          name: uniqueFileName,
+          size: f.size ? String(f.size) : '',
+          driveId: newDriveId,
+          folderId: newFolderId,
+          note: f.note ? String(f.note) : ''
         });
+      });
 
-        /* --- 1. 主题切换逻辑 (深色 / 浅色 / 跟随系统) --- */
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pdd_theme') || 'system';
-            document.getElementById('themeSelect').value = savedTheme;
-            applyTheme(savedTheme);
+      drives = updatedDrives;
+      folders = updatedFolders;
+      files = updatedFiles;
+      pendingBackupData = null;
 
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('pdd_theme') || 'system') === 'system') {
-                    applyTheme('system');
-                }
-            });
+      closeModal('importConfirmModal');
+      closeModal('settingsModal');
+      if (syncStorage()) {
+        window.showToast('备份内容已合并并同步至云端', 'success');
+      }
+    }
+
+    // ==========================================
+    // 危险区清空数据逻辑
+    // ==========================================
+
+    function openClearDataConfirm() {
+      if (!requireAuth()) return;
+      openModal('clearDataConfirmModal');
+    }
+
+    function confirmClearAllData() {
+      if (!requireAuth()) return;
+      drives = [];
+      folders = [];
+      files = [];
+      currentSelectedDriveId = null;
+      currentSelectedFolderId = null;
+      document.getElementById('searchInput').value = '';
+
+      closeModal('clearDataConfirmModal');
+      closeModal('settingsModal');
+      switchMainTab('files');
+      if (syncStorage()) {
+        window.showToast('已清空所有云端数据', 'success');
+      }
+    }
+
+    // ==========================================
+    // 视图切换与层级导航逻辑
+    // ==========================================
+
+    function switchMainTab(tab) {
+      currentMainTab = tab;
+      const viewFiles = document.getElementById('viewFiles');
+      const viewDrives = document.getElementById('viewDrives');
+      const navAllFiles = document.getElementById('navAllFiles');
+      const navDriveMgmt = document.getElementById('navDriveMgmt');
+
+      if (tab === 'files') {
+        viewFiles.classList.remove('hidden');
+        viewDrives.classList.add('hidden');
+        navDriveMgmt.classList.remove('bg-indigo-50', 'text-indigo-600');
+        navDriveMgmt.classList.add('text-slate-600');
+
+        if (currentSelectedDriveId === null) {
+          navAllFiles.classList.add('bg-indigo-50', 'text-indigo-600');
+          navAllFiles.classList.remove('text-slate-600');
+        } else {
+          navAllFiles.classList.remove('bg-indigo-50', 'text-indigo-600');
+          navAllFiles.classList.add('text-slate-600');
         }
+      } else {
+        viewFiles.classList.add('hidden');
+        viewDrives.classList.remove('hidden');
+        navDriveMgmt.classList.add('bg-indigo-50', 'text-indigo-600');
+        navDriveMgmt.classList.remove('text-slate-600');
+        navAllFiles.classList.remove('bg-indigo-50', 'text-indigo-600');
+        navAllFiles.classList.add('text-slate-600');
+      }
 
-        function changeTheme(mode) {
-            localStorage.setItem('pdd_theme', mode);
-            applyTheme(mode);
-            window.showToast(`主题切换为：${mode==='light'?'浅色模式':mode==='dark'?'深色模式':'跟随系统'}`, 'success');
+      renderSidebarDrives();
+      renderBreadcrumb();
+      lucide.createIcons();
+    }
+
+    function filterByDrive(driveId, folderId = null) {
+      currentSelectedDriveId = driveId;
+      currentSelectedFolderId = folderId;
+
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput.value) {
+        searchInput.value = '';
+      }
+
+      switchMainTab('files');
+      renderFiles();
+    }
+
+    function enterFolder(folderId) {
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      filterByDrive(folder.driveId, folder.id);
+    }
+
+    function goUpOneLevel() {
+      if (currentMainTab !== 'files') return;
+
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput.value.trim()) {
+        clearSearch();
+        return;
+      }
+
+      if (currentSelectedFolderId) {
+        const currentFolder = folders.find(f => f.id === currentSelectedFolderId);
+        if (currentFolder && currentFolder.parentId) {
+          filterByDrive(currentFolder.driveId, currentFolder.parentId);
+        } else if (currentFolder) {
+          filterByDrive(currentFolder.driveId, null);
+        } else {
+          filterByDrive(currentSelectedDriveId, null);
         }
+      } else if (currentSelectedDriveId) {
+        filterByDrive(null, null);
+      }
+    }
 
-        function applyTheme(mode) {
-            const root = document.documentElement;
-            if (mode === 'light') {
-                root.classList.remove('dark');
-            } else if (mode === 'dark') {
-                root.classList.add('dark');
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      renderFiles();
+    }
+
+    function getFolderChain(folderId) {
+      const chain = [];
+      let currId = folderId;
+      const visited = new Set();
+      while (currId && !visited.has(currId)) {
+        visited.add(currId);
+        const folder = folders.find(f => f.id === currId);
+        if (!folder) break;
+        chain.unshift(folder);
+        currId = folder.parentId;
+      }
+      return chain;
+    }
+
+    function renderBreadcrumb() {
+      const container = document.getElementById('breadcrumbContainer');
+      const upBtn = document.getElementById('upLevelBtn');
+
+      if (currentMainTab === 'drives') {
+        upBtn.disabled = true;
+        container.innerHTML = `
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+          <span class="font-medium text-slate-800">网盘管理看板</span>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const isAtTopRoot = (currentSelectedDriveId === null && currentSelectedFolderId === null);
+      upBtn.disabled = isAtTopRoot;
+
+      let parts = [];
+
+      if (currentSelectedDriveId === null) {
+        parts.push(`
+          <span class="flex items-center gap-1 font-medium text-slate-800 shrink-0">
+            <i data-lucide="folder-open" class="w-4 h-4 text-amber-500 shrink-0"></i>
+            <span>所有网盘 (根目录)</span>
+          </span>
+        `);
+      } else {
+        parts.push(`
+          <button onclick="filterByDrive(null, null)" class="flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition-colors shrink-0" title="返回全部网盘">
+            <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-indigo-500 shrink-0"></i>
+            <span>全部网盘</span>
+          </button>
+        `);
+
+        const drive = drives.find(d => d.id === currentSelectedDriveId);
+        const driveName = drive ? escapeHtml(drive.name) : '未知网盘';
+        const chain = currentSelectedFolderId ? getFolderChain(currentSelectedFolderId) : [];
+
+        parts.push(`<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>`);
+
+        if (chain.length === 0) {
+          parts.push(`<span class="font-semibold text-slate-800 shrink-0">${driveName}</span>`);
+        } else {
+          parts.push(`
+            <button onclick="filterByDrive('${currentSelectedDriveId}', null)" class="text-slate-600 hover:text-indigo-600 transition-colors shrink-0">
+              ${driveName}
+            </button>
+          `);
+
+          chain.forEach((folder, idx) => {
+            parts.push(`<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>`);
+            const isLast = idx === chain.length - 1;
+            if (isLast) {
+              parts.push(`<span class="font-semibold text-slate-800 shrink-0">${escapeHtml(folder.name)}</span>`);
             } else {
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    root.classList.add('dark');
-                } else {
-                    root.classList.remove('dark');
-                }
+              parts.push(`
+                <button onclick="filterByDrive('${folder.driveId}', '${folder.id}')" class="text-slate-600 hover:text-indigo-600 transition-colors shrink-0">
+                  ${escapeHtml(folder.name)}
+                </button>
+              `);
             }
-            if(expenseChartInstance) renderMonthlyChart();
+          });
+        }
+      }
+
+      container.innerHTML = parts.join('');
+      container.scrollLeft = container.scrollWidth;
+      lucide.createIcons();
+    }
+
+    function renderSidebarDrives() {
+      const list = document.getElementById('sidebarDriveList');
+      if (!window.currentUser) {
+        list.innerHTML = `<div class="nav-text text-[11px] text-slate-400 px-2 py-1">登录后查看网盘</div>`;
+        return;
+      }
+      if (drives.length === 0) {
+        list.innerHTML = `<div class="nav-text text-[11px] text-slate-400 px-2 py-1">暂无网盘</div>`;
+        return;
+      }
+
+      list.innerHTML = drives.map(drive => {
+        const isActive = (currentMainTab === 'files' && currentSelectedDriveId === drive.id);
+        const activeClass = isActive 
+          ? 'bg-indigo-50 text-indigo-600 font-semibold' 
+          : 'text-slate-600 hover:bg-slate-200/60';
+
+        return `
+          <button onclick="filterByDrive('${drive.id}', null)" title="${escapeHtml(drive.name)}" class="nav-item w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${activeClass}">
+            <div class="flex items-center gap-2 truncate">
+              <i data-lucide="hard-drive" class="w-3.5 h-3.5 shrink-0 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+              <span class="nav-text truncate">${escapeHtml(drive.name)}</span>
+            </div>
+            <i data-lucide="chevron-right" class="nav-text w-3 h-3 text-slate-300"></i>
+          </button>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function stripDuplicateSuffix(filename) {
+      return String(filename).replace(/\s+#\d+$/, '');
+    }
+
+    function getFileCategory(filename) {
+      if (!filename) return 'File';
+      const cleanName = stripDuplicateSuffix(filename);
+      const parts = cleanName.split('.');
+      if (parts.length > 1 && parts[parts.length - 1].trim() !== '') {
+        const ext = parts[parts.length - 1].toLowerCase();
+        if (['exe', 'msi', 'bat'].includes(ext)) return 'Application';
+        if (['txt', 'md', 'doc', 'docx', 'pdf'].includes(ext)) return `${ext.toUpperCase()} Document`;
+        if (['jpg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return 'Image File';
+        return `${ext.toUpperCase()} File`;
+      }
+      return 'File';
+    }
+
+    function getFileIcon(filename) {
+      const cleanName = stripDuplicateSuffix(filename);
+      const ext = cleanName.split('.').pop()?.toLowerCase();
+      if (['exe', 'app'].includes(ext)) return 'box';
+      if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(ext)) return 'file-text';
+      if (['jpg', 'png', 'webp', 'gif', 'svg'].includes(ext)) return 'image';
+      if (['zip', 'rar', '7z'].includes(ext)) return 'archive';
+      return 'file';
+    }
+
+    function parseSizeToBytes(sizeStr) {
+      if (!sizeStr) return 0;
+      const match = sizeStr.trim().match(/^([\d.]+)\s*([a-zA-Z]+)?$/);
+      if (!match) return 0;
+      const val = parseFloat(match[1]);
+      const unit = (match[2] || 'B').toUpperCase();
+      const units = { B: 1, KB: 1024, MB: 1024**2, GB: 1024**3, TB: 1024**4 };
+      return val * (units[unit] || 1);
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function getFolderPath(folderId) {
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return '';
+      return folder.parentId ? getFolderPath(folder.parentId) + '/' + folder.name : folder.name;
+    }
+
+    function getFullFolderPath(folder) {
+      const drive = drives.find(d => d.id === folder.driveId);
+      const driveName = drive ? drive.name : 'Unknown';
+      return `${driveName}/${getFolderPath(folder.id)}`;
+    }
+
+    function getFullFilePath(file) {
+      const drive = drives.find(d => d.id === file.driveId);
+      const driveName = drive ? drive.name : 'Unknown';
+      return file.folderId ? `${driveName}/${getFolderPath(file.folderId)}` : `${driveName}/`;
+    }
+
+    function getFolderDirectItemCount(folderId) {
+      const subFolders = folders.filter(f => f.parentId === folderId).length;
+      const subFiles = files.filter(f => f.folderId === folderId).length;
+      return subFolders + subFiles;
+    }
+
+    function renderFiles() {
+      const tbody = document.getElementById('fileTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      const search = searchInput.value.trim().toLowerCase();
+
+      if (search) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      if (!window.currentUser) {
+        document.getElementById('statusBarCount').innerText = '未登录';
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-16 text-center text-slate-400">
+              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-bold text-slate-700 mb-1">需要登录 Google 账号</p>
+              <p class="text-xs text-slate-400 mb-4">请前往右上角「系统设置」登录以同步您的云端网盘索引数据</p>
+              <button onclick="openSettingsModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-sm inline-flex items-center gap-1.5 transition-all">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                打开系统设置登录
+              </button>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      let filteredFolders = [];
+      let filteredFiles = [];
+
+      if (search) {
+        filteredFolders = folders.filter(f => f.name.toLowerCase().includes(search));
+        filteredFiles = files.filter(
+          f => f.name.toLowerCase().includes(search) || (f.note && f.note.toLowerCase().includes(search))
+        );
+      } else if (currentSelectedDriveId === null) {
+        filteredFolders = folders.filter(f => !f.parentId);
+        filteredFiles = files.filter(f => !f.folderId);
+      } else {
+        filteredFolders = folders.filter(
+          f => f.driveId === currentSelectedDriveId && (f.parentId || null) === currentSelectedFolderId
+        );
+        filteredFiles = files.filter(
+          f => f.driveId === currentSelectedDriveId && (f.folderId || null) === currentSelectedFolderId
+        );
+      }
+
+      const totalCount = filteredFolders.length + filteredFiles.length;
+      document.getElementById('statusBarCount').innerText = search
+        ? `搜索到 ${totalCount} 个匹配项目`
+        : `${totalCount} 个项目`;
+
+      if (totalCount === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-slate-400">
+              <i data-lucide="folder-open" class="w-10 h-10 mx-auto mb-2 stroke-1 text-slate-300"></i>
+              <p class="text-xs">${search ? '未找到匹配的文件、文件夹或备注' : '此目录为空'}</p>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const folderRowsHtml = filteredFolders.map(folder => {
+        const fullPath = getFullFolderPath(folder);
+        const childCount = getFolderDirectItemCount(folder.id);
+        return `
+          <tr onclick="enterFolder('${folder.id}')" class="hover:bg-indigo-50/50 transition-colors group cursor-pointer">
+            <td class="py-2 px-4 font-medium text-slate-800 flex items-center gap-2.5">
+              <i data-lucide="folder" class="w-4 h-4 text-amber-500 fill-amber-500/20 shrink-0"></i>
+              <div class="truncate">
+                <span class="block truncate group-hover:text-indigo-600 transition-colors">${escapeHtml(folder.name)}</span>
+                <span class="block text-[10px] font-mono text-slate-400 font-normal truncate">${escapeHtml(fullPath)} · ${childCount} 项</span>
+              </div>
+            </td>
+            <td class="py-2 px-4 text-slate-500 font-normal">File folder</td>
+            <td class="py-2 px-4 text-slate-500 font-mono">-</td>
+            <td class="py-2 px-4 text-slate-400 font-mono">-</td>
+            <td onclick="event.stopPropagation()" class="py-2 px-4 text-right space-x-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              <button onclick="openFolderModal('${folder.id}')" class="p-1 hover:bg-slate-200/60 rounded text-slate-500 hover:text-indigo-600" title="编辑文件夹">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteFolder('${folder.id}')" class="p-1 hover:bg-slate-200/60 rounded text-slate-500 hover:text-rose-600" title="删除文件夹">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const fileRowsHtml = filteredFiles.map(file => {
+        const category = getFileCategory(file.name);
+        const iconName = getFileIcon(file.name);
+        const fullPath = getFullFilePath(file);
+        const noteText = file.note ? escapeHtml(file.note) : '-';
+
+        return `
+          <tr class="hover:bg-indigo-50/40 transition-colors group">
+            <td class="py-2 px-4 font-medium text-slate-800 flex items-center gap-2.5">
+              <i data-lucide="${iconName}" class="w-4 h-4 text-indigo-500 shrink-0"></i>
+              <div class="truncate">
+                <span class="block truncate">${escapeHtml(file.name)}</span>
+                <span class="block text-[10px] font-mono text-slate-400 font-normal truncate">${escapeHtml(fullPath)}</span>
+              </div>
+            </td>
+            <td class="py-2 px-4 text-slate-500 font-normal">${escapeHtml(category)}</td>
+            <td class="py-2 px-4 text-slate-500 font-mono">${escapeHtml(file.size) || '-'}</td>
+            <td class="py-2 px-4 text-slate-500 max-w-[160px] sm:max-w-[220px] truncate" title="${escapeHtml(file.note || '')}">${noteText}</td>
+            <td class="py-2 px-4 text-right space-x-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              <button onclick="openFileModal('${file.id}')" class="p-1 hover:bg-slate-200/60 rounded text-slate-500 hover:text-indigo-600" title="编辑文件">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteFile('${file.id}')" class="p-1 hover:bg-slate-200/60 rounded text-slate-500 hover:text-rose-600" title="删除文件">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.innerHTML = folderRowsHtml + fileRowsHtml;
+      lucide.createIcons();
+    }
+
+    function renderDriveTable() {
+      const tbody = document.getElementById('driveTableBody');
+      if (!window.currentUser) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400">请先在系统设置中登录 Google 账号以查看云端网盘</td></tr>`;
+        return;
+      }
+      if (drives.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400">暂无已注册网盘</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = drives.map(drive => {
+        const folderCount = folders.filter(f => f.driveId === drive.id).length;
+        const fileCount = files.filter(f => f.driveId === drive.id).length;
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-3 px-4 font-semibold text-slate-800 flex items-center gap-2">
+              <i data-lucide="hard-drive" class="w-4 h-4 text-indigo-500"></i>
+              ${escapeHtml(drive.name)}
+            </td>
+            <td class="py-3 px-4 text-slate-600">${folderCount} 个</td>
+            <td class="py-3 px-4 text-slate-600">${fileCount} 个</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="deleteDrive('${drive.id}')" class="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-rose-600" title="删除网盘">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderStats() {
+      document.getElementById('statDrives').innerText = `${drives.length} 个`;
+      document.getElementById('statFiles').innerText = `${files.length} 个`;
+      const totalBytes = files.reduce((acc, f) => acc + parseSizeToBytes(f.size), 0);
+      document.getElementById('statSize').innerText = formatBytes(totalBytes);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); lucide.createIcons(); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // 网盘逻辑
+    function openDriveModal() {
+      if (!requireAuth()) return;
+      document.getElementById('driveNameInput').value = '';
+      openModal('driveModal');
+    }
+    function saveDrive() {
+      if (!requireAuth()) return;
+      const name = document.getElementById('driveNameInput').value.trim();
+      if (!name) return window.showToast('请输入网盘名称', 'warning');
+      drives.push({ id: generateUniqueId(), name });
+      if (syncStorage()) {
+        closeModal('driveModal');
+        window.showToast(`已添加网盘：${name}`, 'success');
+      }
+    }
+    function deleteDrive(id) {
+      if (!requireAuth()) return;
+      if (confirm('确认删除此网盘以及关联的文件记录吗？')) {
+        drives = drives.filter(d => d.id !== id);
+        folders = folders.filter(f => f.driveId !== id);
+        files = files.filter(f => f.driveId !== id);
+        if (currentSelectedDriveId === id) {
+          currentSelectedDriveId = null;
+          currentSelectedFolderId = null;
+        }
+        if (syncStorage()) {
+          window.showToast('网盘已删除', 'success');
+        }
+      }
+    }
+
+    function getDescendantFolderIds(folderId) {
+      let result = [];
+      const children = folders.filter(f => f.parentId === folderId);
+      for (const child of children) {
+        result.push(child.id);
+        result = result.concat(getDescendantFolderIds(child.id));
+      }
+      return result;
+    }
+
+    // 文件夹逻辑
+    function openFolderModal(folderId = null) {
+      if (!requireAuth()) return;
+      if (drives.length === 0) return window.showToast('请先添加至少一个网盘', 'warning');
+      const driveSelect = document.getElementById('folderDriveSelect');
+      driveSelect.innerHTML = drives.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+
+      if (folderId) {
+        const folder = folders.find(f => f.id === folderId);
+        document.getElementById('folderModalTitle').innerText = '编辑文件夹';
+        document.getElementById('editFolderId').value = folder.id;
+        driveSelect.value = folder.driveId;
+        updateFolderParentOptions();
+        document.getElementById('folderParentSelect').value = folder.parentId || '';
+        document.getElementById('folderNameInput').value = folder.name;
+      } else {
+        document.getElementById('folderModalTitle').innerText = '添加文件夹';
+        document.getElementById('editFolderId').value = '';
+        if (currentSelectedDriveId) {
+          driveSelect.value = currentSelectedDriveId;
+        }
+        updateFolderParentOptions();
+        if (currentSelectedFolderId) {
+          document.getElementById('folderParentSelect').value = currentSelectedFolderId;
+        }
+        document.getElementById('folderNameInput').value = '';
+      }
+      openModal('folderModal');
+    }
+
+    function updateFolderParentOptions() {
+      const driveId = document.getElementById('folderDriveSelect').value;
+      const editFolderId = document.getElementById('editFolderId').value;
+      const parentSelect = document.getElementById('folderParentSelect');
+      
+      let excludedIds = [];
+      if (editFolderId) {
+        excludedIds = [editFolderId, ...getDescendantFolderIds(editFolderId)];
+      }
+
+      const driveFolders = folders.filter(f => f.driveId === driveId && !excludedIds.includes(f.id));
+      parentSelect.innerHTML = `<option value="">根目录</option>` + driveFolders.map(f => `<option value="${f.id}">${escapeHtml(getFolderPath(f.id))}</option>`).join('');
+    }
+
+    function saveFolder() {
+      if (!requireAuth()) return;
+      const id = document.getElementById('editFolderId').value;
+      const driveId = document.getElementById('folderDriveSelect').value;
+      const parentId = document.getElementById('folderParentSelect').value || null;
+      const name = document.getElementById('folderNameInput').value.trim();
+      if (!name) return window.showToast('请输入文件夹名称', 'warning');
+
+      if (id) {
+        const index = folders.findIndex(f => f.id === id);
+        folders[index] = { ...folders[index], driveId, parentId, name };
+      } else {
+        folders.push({ id: generateUniqueId(), driveId, parentId, name });
+      }
+      if (syncStorage()) {
+        closeModal('folderModal');
+        window.showToast(id ? '文件夹已更新' : `已创建文件夹：${name}`, 'success');
+      }
+    }
+
+    function deleteFolder(id) {
+      if (!requireAuth()) return;
+      if (confirm('删除文件夹将同时清理其内部的子文件夹及关联文件索引，确认删除吗？')) {
+        const targetFolder = folders.find(f => f.id === id);
+        const toDeleteIds = [id, ...getDescendantFolderIds(id)];
+        folders = folders.filter(f => !toDeleteIds.includes(f.id));
+        files = files.filter(f => !toDeleteIds.includes(f.folderId));
+
+        if (currentSelectedFolderId && toDeleteIds.includes(currentSelectedFolderId)) {
+          currentSelectedFolderId = targetFolder ? (targetFolder.parentId || null) : null;
+        }
+        if (syncStorage()) {
+          window.showToast('文件夹已删除', 'success');
+        }
+      }
+    }
+
+    // 文件逻辑
+    function openFileModal(fileId = null) {
+      if (!requireAuth()) return;
+      if (drives.length === 0) return window.showToast('请先添加至少一个网盘', 'warning');
+      const driveSelect = document.getElementById('fileDriveSelect');
+      driveSelect.innerHTML = drives.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+
+      if (fileId) {
+        const file = files.find(f => f.id === fileId);
+        document.getElementById('fileModalTitle').innerText = '编辑文件';
+        document.getElementById('editFileId').value = file.id;
+        document.getElementById('fileNameInput').value = file.name;
+        document.getElementById('fileSizeInput').value = file.size;
+        document.getElementById('fileNoteInput').value = file.note || '';
+        driveSelect.value = file.driveId;
+        updateFileFolderOptions();
+        document.getElementById('fileFolderSelect').value = file.folderId || '';
+      } else {
+        document.getElementById('fileModalTitle').innerText = '添加文件';
+        document.getElementById('editFileId').value = '';
+        document.getElementById('fileNameInput').value = '';
+        document.getElementById('fileSizeInput').value = '';
+        document.getElementById('fileNoteInput').value = '';
+        if (currentSelectedDriveId) {
+          driveSelect.value = currentSelectedDriveId;
+        }
+        updateFileFolderOptions();
+        if (currentSelectedFolderId) {
+          document.getElementById('fileFolderSelect').value = currentSelectedFolderId;
+        }
+      }
+      openModal('fileModal');
+    }
+
+    function updateFileFolderOptions() {
+      const driveId = document.getElementById('fileDriveSelect').value;
+      const folderSelect = document.getElementById('fileFolderSelect');
+      const driveFolders = folders.filter(f => f.driveId === driveId);
+      folderSelect.innerHTML = `<option value="">根目录</option>` + driveFolders.map(f => `<option value="${f.id}">${escapeHtml(getFolderPath(f.id))}</option>`).join('');
+    }
+
+    function saveFile() {
+      if (!requireAuth()) return;
+      const id = document.getElementById('editFileId').value;
+      const name = document.getElementById('fileNameInput').value.trim();
+      const size = document.getElementById('fileSizeInput').value.trim();
+      const driveId = document.getElementById('fileDriveSelect').value;
+      const folderId = document.getElementById('fileFolderSelect').value || null;
+      const note = document.getElementById('fileNoteInput').value.trim();
+
+      if (!name) return window.showToast('请输入文件名称', 'warning');
+
+      if (id) {
+        const index = files.findIndex(f => f.id === id);
+        files[index] = { ...files[index], name, size, driveId, folderId, note };
+      } else {
+        files.push({ id: generateUniqueId(), name, size, driveId, folderId, note });
+      }
+      if (syncStorage()) {
+        closeModal('fileModal');
+        window.showToast(id ? '文件信息已更新' : `已添加文件：${name}`, 'success');
+      }
+    }
+
+    function deleteFile(id) {
+      if (!requireAuth()) return;
+      if (confirm('确认删除该文件索引吗？')) {
+        files = files.filter(f => f.id !== id);
+        if (syncStorage()) {
+          window.showToast('文件索引已删除', 'success');
+        }
+      }
+    }
+  </script>
+
+  <!-- Firebase Authentication & Cloud Firestore 实时同步模块 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC4VfqkcTJkVmuoXHyNZEuHNCro8pKtS60",
+      authDomain: "multi-cloud-manager-a0fbd.firebaseapp.com",
+      projectId: "multi-cloud-manager-a0fbd",
+      storageBucket: "multi-cloud-manager-a0fbd.firebasestorage.app",
+      messagingSenderId: "515595480169",
+      appId: "1:515595480169:web:a6b66c2c21178fff4006f8",
+      measurementId: "G-KXZH52CMB1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let unsubscribeSnapshot = null;
+
+    // 更新系统设置、顶栏状态点与侧边栏账号状态 UI
+    function updateAuthUI(user) {
+      const loggedOutView = document.getElementById('settingsLoggedOutView');
+      const loggedInView = document.getElementById('settingsLoggedInView');
+      const avatarImg = document.getElementById('userAvatarImg');
+      const avatarFallback = document.getElementById('userAvatarFallback');
+      const sidebarModeIcon = document.getElementById('sidebarModeIcon');
+      const sidebarModeText = document.getElementById('sidebarModeText');
+      const settingsAuthDot = document.getElementById('settingsAuthDot');
+
+      if (user) {
+        loggedOutView.classList.add('hidden');
+        loggedInView.classList.remove('hidden');
+
+        document.getElementById('userDisplayName').innerText = user.displayName || 'Google 用户';
+        document.getElementById('userEmailText').innerText = user.email || '';
+
+        if (user.photoURL) {
+          avatarImg.src = user.photoURL;
+          avatarImg.classList.remove('hidden');
+          avatarFallback.classList.add('hidden');
+        } else {
+          avatarImg.classList.add('hidden');
+          avatarFallback.classList.remove('hidden');
+          avatarFallback.innerText = (user.displayName || user.email || 'G')[0].toUpperCase();
         }
 
-        /* --- 2. 汇率设置逻辑 --- */
-        function updateExchangeRate(val) {
-            const rate = parseFloat(val);
-            if (!isNaN(rate) && rate > 0) {
-                window.RMB_TO_MYR_RATE = rate;
-                localStorage.setItem('pdd_exchange_rate', rate);
-                window.showToast(`汇率已设定为 1 RMB = ${rate} MYR`, 'success');
+        settingsAuthDot.classList.remove('bg-amber-400');
+        settingsAuthDot.classList.add('bg-emerald-500');
+        settingsAuthDot.title = '已登录并实时同步';
+
+        sidebarModeIcon.setAttribute('data-lucide', 'cloud-check');
+        sidebarModeIcon.classList.remove('text-amber-500');
+        sidebarModeIcon.classList.add('text-emerald-500');
+        sidebarModeText.innerText = '云端实时同步中';
+      } else {
+        loggedOutView.classList.remove('hidden');
+        loggedInView.classList.add('hidden');
+
+        settingsAuthDot.classList.remove('bg-emerald-500');
+        settingsAuthDot.classList.add('bg-amber-400');
+        settingsAuthDot.title = '未登录';
+
+        sidebarModeIcon.setAttribute('data-lucide', 'lock');
+        sidebarModeIcon.classList.remove('text-emerald-500');
+        sidebarModeIcon.classList.add('text-amber-500');
+        sidebarModeText.innerText = '请先登录云端账号';
+      }
+      lucide.createIcons();
+    }
+
+    // Google 弹窗登录
+    window.loginWithGoogle = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        console.error('Google 登录失败:', err);
+        if (err.code === 'auth/operation-not-supported-in-this-environment' || window.location.protocol === 'file:') {
+          window.showToast('本地 file:// 协议不支持 Google 登录，请部署至 HTTPS 网站后访问', 'error');
+        } else if (err.code === 'auth/unauthorized-domain') {
+          window.showToast(`当前域名 (${window.location.hostname}) 未添加到 Firebase 授权网域`, 'error');
+        } else if (err.code !== 'auth/popup-closed-by-user') {
+          window.showToast('Google 登录失败：' + (err.message || err.code), 'error');
+        }
+      }
+    };
+
+    // 退出登录
+    window.logoutGoogle = async () => {
+      try {
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+          unsubscribeSnapshot = null;
+        }
+        await signOut(auth);
+      } catch (err) {
+        window.showToast('退出登录失败：' + err.message, 'error');
+      }
+    };
+
+    // 实时监听登录态与 Firestore 文档变化
+    onAuthStateChanged(auth, (user) => {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+
+      if (user) {
+        window.currentUser = user;
+        updateAuthUI(user);
+        window.showToast(`欢迎回来，${user.displayName || user.email}`, 'success');
+
+        unsubscribeSnapshot = onSnapshot(
+          doc(db, 'users', user.uid),
+          (docSnap) => {
+            if (docSnap.exists()) {
+              const norm = normalizeDataset(docSnap.data());
+              drives = norm.drives;
+              folders = norm.folders;
+              files = norm.files;
+
+              // 若当前所在网盘或文件夹在另一端被删除，自动回退至上级有效路径
+              if (currentSelectedDriveId && !drives.some(d => d.id === currentSelectedDriveId)) {
+                currentSelectedDriveId = null;
+                currentSelectedFolderId = null;
+              } else if (currentSelectedFolderId && !folders.some(f => f.id === currentSelectedFolderId)) {
+                currentSelectedFolderId = null;
+              }
             } else {
-                window.showToast('请输入有效的汇率数值！', 'error');
+              drives = [];
+              folders = [];
+              files = [];
             }
-        }
 
-        function autoConvertCurrency() { 
-            const r = parseFloat(document.getElementById('priceRMB').value); 
-            if(!isNaN(r) && r > 0) {
-                document.getElementById('priceMYR').value = (r * window.RMB_TO_MYR_RATE).toFixed(2); 
-            }
-        }
-
-        /* --- 3. 详情弹窗与操作迁移逻辑 --- */
-        function openDetailModal(id) {
-            const r = window.records.find(x => x.id === id);
-            if (!r) return;
-            currentDetailRecordId = id;
-            document.getElementById('detailOrderNum').innerText = r.orderNum || '无';
-            document.getElementById('detailOrderTime').innerText = formatDisplayDateTime(r.orderTime);
-            document.getElementById('detailReceivedTime').innerText = formatDisplayDateTime(r.receivedTime);
-            document.getElementById('detailProductName').innerText = r.productName || '-';
-            document.getElementById('detailDescription').innerText = r.description || '无规格描述';
-            document.getElementById('detailPriceMYR').innerText = `RM ${parseFloat(r.priceMYR||0).toFixed(2)}`;
-            document.getElementById('detailPriceRMB').innerText = `¥ ${r.priceRMB || '-'}`;
-            document.getElementById('detailCnCourier').innerText = r.cnCourier || '-';
-            document.getElementById('detailCnTracking').innerText = r.cnTracking || '未录入';
-            document.getElementById('detailMyCourier').innerText = r.myCourier || '-';
-            document.getElementById('detailMyTracking').innerText = r.myTracking || '未录入';
-            document.getElementById('detailRemarks').innerText = r.remarks || '无';
-            document.getElementById('detailModal').classList.remove('hidden');
-        }
-
-        function closeDetailModal() {
-            document.getElementById('detailModal').classList.add('hidden');
-            currentDetailRecordId = null;
-        }
-
-        function editFromDetail() {
-            if (!currentDetailRecordId) return;
-            const id = currentDetailRecordId;
-            closeDetailModal();
-            editRecord(id);
-        }
-
-        function deleteFromDetail() {
-            if (!currentDetailRecordId) return;
-            const id = currentDetailRecordId;
-            closeDetailModal();
-            askDeleteRecord(id);
-        }
-
-        /* --- 常规基础函数 --- */
-        function switchPage(pageName) {
-            const pr = document.getElementById('pageRecords'), pa = document.getElementById('pageAnalytics');
-            const t1 = document.getElementById('navTab1'), t2 = document.getElementById('navTab2');
-            if (pageName === 'records') {
-                pr.classList.remove('hidden'); pa.classList.add('hidden');
-                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5";
-                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all opacity-80 hover:opacity-100 border border-[var(--border-color)] inline-flex items-center gap-1.5";
-            } else {
-                pr.classList.add('hidden'); pa.classList.remove('hidden');
-                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all opacity-80 hover:opacity-100 border border-[var(--border-color)] inline-flex items-center gap-1.5";
-                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5";
-                renderMonthlyChart();
-            }
-        }
-
-        function initFlatpickrPickers() {
-            const conf = { enableTime: true, time_24hr: true, dateFormat: "d/m/Y H:i", allowInput: false, disableMobile: true };
-            fpOrderTime = flatpickr("#orderTime", { ...conf, defaultDate: new Date() });
-            fpReceivedTime = flatpickr("#receivedTime", { ...conf, defaultDate: null });
-            fpMarkReceivedTime = flatpickr("#markReceivedDateTimeInput", { ...conf, defaultDate: new Date() });
-        }
-
-        function parseToDateObj(input) {
-            if (!input) return null; if (input instanceof Date) return input;
-            const match = String(input).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
-            if (match) return new Date(match[3], match[2] - 1, match[1], match[4] || 0, match[5] || 0);
-            const fb = new Date(input); return isNaN(fb.getTime()) ? null : fb;
-        }
-
-        function calculateDeliveryDays(order, received) {
-            const o = parseToDateObj(order); if (!o) return '-';
-            const diff = (parseToDateObj(received) || new Date()) - o;
-            return Math.max(0, Math.floor(diff / 86400000));
-        }
-
-        function formatDisplayDateTime(v) {
-            if (!v) return '-'; const d = parseToDateObj(v); if (!d) return String(v);
-            const pad = n => String(n).padStart(2, '0');
-            return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        }
-
-        function getMYTrackingHighlightMap() {
-            const counts = {};
-            window.records.forEach(r => { const t = (r.myTracking || '').trim(); if (t) counts[t] = (counts[t] || 0) + 1; });
-            const dupes = Object.keys(counts).filter(t => counts[t] > 1);
-            const map = {};
-            dupes.forEach((t, i) => {
-                const y = i % 2 === 0;
-                map[t] = { 
-                    count: counts[t], 
-                    badge: y 
-                        ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' 
-                        : 'bg-gradient-to-r from-rose-500 to-indigo-500 text-white', 
-                    style: y 
-                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-500' 
-                        : 'bg-rose-500/10 border-rose-500/40 text-rose-500' 
-                };
-            });
-            return { map, total: dupes.length };
-        }
-
-        window.renderTable = function() {
-            const tbody = document.getElementById('recordsTableBody'), es = document.getElementById('emptyState');
-            const search = document.getElementById('searchInput').value.trim().toLowerCase();
-            const filter = document.getElementById('statusFilter').value;
-            const { map, total } = getMYTrackingHighlightMap();
-
-            const list = window.records.filter(r => {
-                const rec = !!(r.receivedTime && String(r.receivedTime).trim());
-                const bun = map[(r.myTracking || '').trim()] !== undefined;
-                const mSearch = [r.productName, r.orderNum, r.cnTracking, r.myTracking, r.remarks].some(s => (s||'').toLowerCase().includes(search));
-                const mStat = filter==='ALL' || (filter==='PENDING' && !rec) || (filter==='RECEIVED' && rec) || (filter==='BUNDLED' && bun);
-                return mSearch && mStat;
-            });
-
-            updateStatistics(total);
-            tbody.innerHTML = '';
-            if (!list.length) { es.classList.remove('hidden'); es.classList.add('flex'); }
-            else {
-                es.classList.add('hidden'); es.classList.remove('flex');
-                list.forEach(r => {
-                    const rec = !!(r.receivedTime && String(r.receivedTime).trim());
-                    const hl = map[(r.myTracking || '').trim()];
-                    const tr = document.createElement('tr');
-                    tr.style.borderColor = "var(--border-color)";
-                    tr.className = "hover:bg-violet-500/10 border-b transition-colors";
-                    
-                    tr.innerHTML = `
-                        <td class="px-5 py-4"><div class="font-medium text-xs font-bold flex gap-1"><span>${r.orderNum||'无'}</span></div><div style="color: var(--text-sub);" class="text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div></td>
-                        <td class="px-5 py-4"><div class="font-semibold">${r.productName||''}</div><div style="color: var(--text-sub);" class="text-xs max-w-xs truncate">${r.description||''}</div></td>
-                        <td class="px-5 py-4 text-right"><div class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500">RM ${parseFloat(r.priceMYR||0).toFixed(2)}</div><div style="color: var(--text-sub);" class="text-xs font-sans">¥ ${r.priceRMB||'-'}</div></td>
-                        <td class="px-5 py-4"><div class="text-xs font-medium">${r.cnCourier||'-'}</div><div style="color: var(--text-sub);" class="text-xs mt-1 font-sans">${r.cnTracking||'-'}</div></td>
-                        <td class="px-5 py-4">
-                            <div class="text-xs font-medium">${r.myCourier||'-'}</div>
-                            <div style="border-color: var(--border-color);" class="text-xs mt-1 font-medium ${hl?hl.style:''} px-1.5 py-0.5 rounded inline-block border">${r.myTracking||'未录入'}</div>
-                            ${hl ? `<div class="mt-1"><span class="${hl.badge} text-[10px] font-bold px-2 py-0.5 rounded-full badge-pulse shadow-sm inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>集包 (${hl.count}件)</span></div>` : ''}
-                        </td>
-                        <td class="px-5 py-4">
-                            ${rec 
-                                ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>已签收</span><div style="color: var(--text-sub);" class="text-[11px] mt-1">${formatDisplayDateTime(r.receivedTime)}</div>` 
-                                : `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>待签收</span>`}
-                        </td>
-                        <td class="px-5 py-4 text-center text-xs font-medium">${rec ? `用时 ${calculateDeliveryDays(r.orderTime, r.receivedTime)} 天` : `已等 ${calculateDeliveryDays(r.orderTime, null)} 天`}</td>
-                        <td class="px-5 py-4 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                ${rec 
-                                    ? `<button onclick="unmarkReceived('${r.id}')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-2 py-1 rounded hover:opacity-80 transition-colors inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>撤销签收</button>` 
-                                    : `<button onclick="openMarkReceivedModal('${r.id}')" class="text-xs bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-2.5 py-1 rounded hover:from-emerald-500 hover:to-teal-500 font-medium transition-all inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>标记签收</button>`}
-                                <!-- 详情按钮 (Heroicon v1 outline: information-circle) -->
-                                <button onclick="openDetailModal('${r.id}')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-2.5 py-1 rounded hover:border-pink-500 transition-colors font-medium inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    详情
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        function updateStatistics(dupes) {
-            let myr=0, rmb=0, p=0, r=0;
-            window.records.forEach(x => { myr+=parseFloat(x.priceMYR||0); rmb+=parseFloat(x.priceRMB||0); (x.receivedTime && String(x.receivedTime).trim()) ? r++ : p++; });
-            document.getElementById('statTotalMYR').innerText = `RM ${myr.toFixed(2)}`;
-            document.getElementById('statTotalRMB').innerText = `¥ ${rmb.toFixed(2)}`;
-            document.getElementById('statTotalItems').innerText = window.records.length;
-            document.getElementById('statPendingItems').innerText = p;
-            document.getElementById('statReceivedItems').innerText = r;
-            document.getElementById('statDuplicateGroups').innerText = dupes;
-            document.getElementById('analyticsTotalMYR').innerText = `RM ${myr.toFixed(2)}`;
-        }
-
-        function renderMonthlyChart() {
-            const sums = {};
-            window.records.forEach(r => {
-                const d = parseToDateObj(r.orderTime);
-                if (d) { const k = `${d.getFullYear()}年${String(d.getMonth()+1).padStart(2,'0')}月`; sums[k] = (sums[k]||0) + parseFloat(r.priceMYR||0); }
-            });
-            const labels = Object.keys(sums).sort();
-            const data = labels.map(l => sums[l].toFixed(2));
-            const ctx = document.getElementById('monthlyExpenseChart').getContext('2d');
-            if(expenseChartInstance) expenseChartInstance.destroy();
-            
-            const isDark = document.documentElement.classList.contains('dark');
-            expenseChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: labels.length?labels:['暂无'], datasets: [{ label: '月度总支出 (RM)', data: data.length?data:[0], backgroundColor: '#8B5CF6', borderRadius: 8 }] },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: isDark ? '#94A3B8' : '#64748B' }, grid: { color: isDark ? 'rgba(49, 46, 129, 0.3)' : 'rgba(226, 232, 240, 0.8)' } },
-                        y: { ticks: { color: isDark ? '#94A3B8' : '#64748B' }, grid: { color: isDark ? 'rgba(49, 46, 129, 0.3)' : 'rgba(226, 232, 240, 0.8)' } }
-                    },
-                    plugins: { legend: { labels: { color: isDark ? '#E2E8F0' : '#1E1B4B' } } }
-                }
-            });
-        }
-
-        function openFormModal() {
-            document.getElementById('formModal').classList.remove('hidden');
-            if(!document.getElementById('recordId').value){ 
-                document.getElementById('modalTitle').innerText = '新增记录';
-                document.getElementById('recordForm').reset(); 
-                fpOrderTime.setDate(new Date()); 
-                fpReceivedTime.clear(); 
-            }
-        }
-        function closeFormModal() { document.getElementById('formModal').classList.add('hidden'); document.getElementById('recordId').value=''; document.getElementById('recordForm').reset(); }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('recordId').value;
-            const data = {
-                id: id || Date.now().toString(),
-                orderNum: document.getElementById('orderNum').value.trim(), orderTime: document.getElementById('orderTime').value.trim(), receivedTime: document.getElementById('receivedTime').value.trim(),
-                productName: document.getElementById('productName').value.trim(), description: document.getElementById('description').value.trim(),
-                priceRMB: document.getElementById('priceRMB').value, priceMYR: document.getElementById('priceMYR').value,
-                cnCourier: document.getElementById('cnCourier').value.trim(), cnTracking: document.getElementById('cnTracking').value.trim(),
-                myCourier: document.getElementById('myCourier').value.trim(), myTracking: document.getElementById('myTracking').value.trim(),
-                remarks: document.getElementById('remarks').value.trim(), other: document.getElementById('other').value.trim()
-            };
-            if(id) { const i = window.records.findIndex(r=>r.id===id); if(i>-1) window.records[i]=data; } else window.records.unshift(data);
-            if(window.saveRecords) window.saveRecords(); renderTable(); closeFormModal();
-        }
-
-        function editRecord(id) {
-            const r = window.records.find(x=>x.id===id); if(!r) return;
-            document.getElementById('modalTitle').innerText = '修改记录';
-            document.getElementById('recordId').value = r.id; document.getElementById('orderNum').value = r.orderNum||'';
-            r.orderTime ? fpOrderTime.setDate(parseToDateObj(r.orderTime)) : fpOrderTime.setDate(new Date());
-            r.receivedTime ? fpReceivedTime.setDate(parseToDateObj(r.receivedTime)) : fpReceivedTime.clear();
-            ['productName','description','priceRMB','priceMYR','cnCourier','cnTracking','myCourier','myTracking','remarks','other'].forEach(k=>document.getElementById(k).value=r[k]||'');
-            openFormModal();
-        }
-
-        function askDeleteRecord(id) { if(confirm("确定要删除此订单记录？")) { window.records = window.records.filter(r=>r.id!==id); if(window.saveRecords) window.saveRecords(); renderTable(); } }
-
-        function openMarkReceivedModal(id) {
-            const r = window.records.find(x=>x.id===id); if(!r) return; recordToMarkReceivedId = id;
-            document.getElementById('markPreviewOrderNum').innerText = r.orderNum||'-'; document.getElementById('markPreviewProductName').innerText = r.productName||'-';
-            const t = (r.myTracking||'').trim(), n = document.getElementById('markBundledNotice');
-            if(t && window.records.filter(x=>(x.myTracking||'').trim()===t && x.id!==id).length > 0) n.classList.remove('hidden'); else n.classList.add('hidden');
-            fpMarkReceivedTime.setDate(new Date()); document.getElementById('markReceivedModal').classList.remove('hidden');
-        }
-        function closeMarkReceivedModal() { document.getElementById('markReceivedModal').classList.add('hidden'); recordToMarkReceivedId = null; }
-
-        function confirmMarkReceived() {
-            if(!recordToMarkReceivedId) return; const r = window.records.find(x=>x.id===recordToMarkReceivedId); const val = document.getElementById('markReceivedDateTimeInput').value;
-            if(!val||!val.trim()) return window.showToast('请选择时间！','error');
-            if(r) {
-                const t = val.trim(), myT = (r.myTracking||'').trim(); r.receivedTime = t; let c = 1;
-                if(myT) window.records.forEach(x => { if(x.id!==r.id && (x.myTracking||'').trim()===myT) { x.receivedTime=t; c++; } });
-                if(window.saveRecords) window.saveRecords(); renderTable(); window.showToast(`成功签收 ${c} 件包裹`,'success');
-            }
-            closeMarkReceivedModal();
-        }
-
-        function unmarkReceived(id) {
-            const r = window.records.find(x=>x.id===id);
-            if(r) {
-                r.receivedTime = ''; let c = 1; const myT = (r.myTracking||'').trim();
-                if(myT) window.records.forEach(x => { if(x.id!==r.id && (x.myTracking||'').trim()===myT && x.receivedTime) { x.receivedTime=''; c++; } });
-                if(window.saveRecords) window.saveRecords(); renderTable(); window.showToast(`撤销了 ${c} 件商品的签收`,'info');
-            }
-        }
-
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('statusFilter').value = 'ALL';
-            renderTable();
-        }
-
-        function getFormattedTimestamp() {
             const now = new Date();
-            const pad = n => String(n).padStart(2, '0');
-            const dd = pad(now.getDate());
-            const mm = pad(now.getMonth() + 1);
-            const yyyy = now.getFullYear();
-            const hh = pad(now.getHours());
-            const min = pad(now.getMinutes());
-            const ss = pad(now.getSeconds());
-            return `${dd}${mm}${yyyy}_${hh}${min}${ss}`;
-        }
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            document.getElementById('lastSyncTimeText').innerText = `云端已同步 (${timeStr})`;
+            document.getElementById('syncBadgeText').innerText = '实时同步';
 
-        function toggleExportMenu() {
-            document.getElementById('exportMenu').classList.toggle('hidden');
-        }
-
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('exportMenu');
-            const button = event.target.closest('button[onclick="toggleExportMenu()"]');
-            if (!button && menu && !menu.classList.contains('hidden')) {
-                menu.classList.add('hidden');
+            window.renderAll();
+          },
+          (error) => {
+            console.error('Firestore 实时监听异常:', error);
+            if (error.code === 'permission-denied') {
+              window.showToast('云端读取权限被拒绝，请检查 Firestore 安全规则', 'error');
+            } else {
+              window.showToast('云端同步连接中断，请检查网络', 'error');
             }
-        });
+          }
+        );
+      } else {
+        window.currentUser = null;
+        drives = [];
+        folders = [];
+        files = [];
+        currentSelectedDriveId = null;
+        currentSelectedFolderId = null;
+        updateAuthUI(null);
+        window.renderAll();
+        window.showToast('未登录：请前往系统设置登录 Google 账号', 'info');
+      }
+    });
 
-        function exportDataJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.records, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `pdd_${getFormattedTimestamp()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function exportDataCSV() {
-            if (!window.records.length) return window.showToast("没有可导出的数据", "error");
-            let csvContent = "\uFEFF订单号,下单时间,签收时间,商品名称,规格描述,价格(RMB),价格(MYR),中国快递,中国单号,大马快递,大马单号,备注,其他\n";
-            window.records.forEach(r => {
-                const row = [
-                    r.orderNum, r.orderTime, r.receivedTime, r.productName, r.description,
-                    r.priceRMB, r.priceMYR, r.cnCourier, r.cnTracking, r.myCourier, r.myTracking,
-                    r.remarks, r.other
-                ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',');
-                csvContent += row + "\n";
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `pdd_${getFormattedTimestamp()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        }
-
-        function openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
-        function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
-
-        window.importDataJSON = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedRecords = JSON.parse(e.target.result);
-                    if (Array.isArray(importedRecords)) {
-                        window.records = importedRecords;
-                        if (window.saveRecords) window.saveRecords();
-                        renderTable();
-                        window.showToast("成功导入数据并已同步至云端！", "success");
-                    } else {
-                        window.showToast("文件格式不正确！", "error");
-                    }
-                } catch (err) {
-                    window.showToast("解析 JSON 文件失败", "error");
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        };
-
-        window.showToast = function(msg, type='info') {
-            const c = document.getElementById('toastContainer'), t = document.createElement('div');
-            t.className = `px-4 py-3 rounded-xl shadow-2xl border text-sm text-white transition-all transform translate-y-2 opacity-0 flex items-center gap-2 ${type==='success'?'bg-gradient-to-r from-violet-900 to-pink-900 border-pink-500/50':type==='error'?'bg-red-950 border-red-800/80':'bg-indigo-950 border-indigo-800/80'}`;
-            const icon = type === 'success' 
-                ? `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                : type === 'error'
-                ? `<svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                : `<svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            t.innerHTML = `${icon}<span>${msg}</span>`; c.appendChild(t);
-            setTimeout(()=>t.classList.remove('translate-y-2','opacity-0'),10); 
-            setTimeout(()=>{t.classList.add('opacity-0'); setTimeout(()=>t.remove(),300);}, 3000);
-        }
-    </script>
+    // 写入云端 Firestore
+    window.saveRecordsToCloud = function() {
+      if (!window.currentUser) {
+        window.showToast('请先登录 Google 账号！', 'error');
+        return;
+      }
+      document.getElementById('syncBadgeText').innerText = '同步中...';
+      setDoc(doc(db, 'users', window.currentUser.uid), {
+        drives,
+        folders,
+        files,
+        updatedAt: Date.now()
+      }).catch((error) => {
+        console.error('云端同步失败:', error);
+        document.getElementById('syncBadgeText').innerText = '同步失败';
+        window.showToast('云同步失败，请检查网络或 Firestore 规则', 'error');
+      });
+    };
+  </script>
 </body>
 </html>
