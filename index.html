@@ -74,6 +74,20 @@
     <!-- Toast Notification -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- 全局浮动三点操作菜单 (防表格裁切) -->
+    <div id="rowActionMenu" style="background-color: var(--bg-card); border-color: var(--border-color);" class="hidden fixed z-50 w-36 rounded-xl shadow-2xl border overflow-hidden">
+        <button id="menuDetailBtn" style="border-color: var(--border-color);" class="w-full text-left px-4 py-2.5 text-xs hover:bg-violet-500/10 font-semibold border-b flex items-center gap-2 transition-colors">
+            <!-- Heroicon v1 outline: information-circle -->
+            <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            订单信息
+        </button>
+        <button id="menuDeleteBtn" class="w-full text-left px-4 py-2.5 text-xs text-red-500 hover:bg-red-500/10 font-semibold flex items-center gap-2 transition-colors">
+            <!-- Heroicon v1 outline: trash -->
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            删除订单
+        </button>
+    </div>
+
     <!-- Main Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
 
@@ -81,7 +95,7 @@
         <header style="background-color: var(--bg-card); border-color: var(--border-color);" class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl shadow-lg border transition-all">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                    <!-- 拼多多官方 SVG Logo (严格匹配小写 images 目录，并带线上备用容错) -->
+                    <!-- 拼多多官方 SVG Logo -->
                     <img src="images/pinduoduo-seeklogo.svg" 
                          onerror="this.onerror=null; this.src='https://jiebochua-tech.github.io/Pinduoduotracking/images/pinduoduo-seeklogo.svg';" 
                          alt="拼多多" 
@@ -276,7 +290,7 @@
                                 <th class="px-5 pt-3.5 pb-2 text-center">用时</th>
                                 <th class="px-5 pt-3.5 pb-2 text-center">操作</th>
                             </tr>
-                            <!-- 新增表头第二行：在“订单号”下方左侧放置“全选”+ 复选框 -->
+                            <!-- 在“订单号 & 下单时间”行下方增加一行，在左侧提供“全选”+ 复选框 -->
                             <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs">
                                 <th class="px-5 py-2" colspan="8">
                                     <label class="inline-flex items-center gap-2 cursor-pointer select-none font-semibold">
@@ -380,15 +394,15 @@
             <div style="border-color: var(--border-color); background-color: var(--bg-sub);" class="px-6 py-4 border-t flex flex-wrap items-center justify-between gap-2">
                 <!-- 红底白字删除按钮 -->
                 <button onclick="deleteFromDetail()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
+                    <!-- Heroicon v1 outline: trash -->
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     删除订单
                 </button>
                 <div class="flex flex-wrap items-center gap-2">
                     <!-- 标记签收 / 撤销签收 动态按钮 -->
-                    <button id="detailToggleReceiveBtn" onclick="toggleReceiveFromDetail()" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5">
-                        <!-- 由 JS 根据当前签收状态动态渲染 -->
-                    </button>
+                    <button id="detailToggleReceiveBtn" onclick="toggleReceiveFromDetail()" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5"></button>
                     <button onclick="editFromDetail()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md inline-flex items-center gap-1.5">
+                        <!-- Heroicon v1 outline: pencil-alt -->
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         编辑订单
                     </button>
@@ -629,7 +643,8 @@
     <!-- UI 与业务逻辑 -->
     <script>
         window.records = [];
-        let recordToDeleteId = null;
+        let selectedIds = new Set();
+        let currentFilteredIds = [];
         let recordToMarkReceivedId = null;
         let currentDetailRecordId = null;
         let expenseChartInstance = null;
@@ -698,7 +713,127 @@
             }
         }
 
-        /* --- 3. 详情弹窗与操作迁移逻辑 --- */
+        /* --- 3. 多选与批量操作逻辑 --- */
+        function toggleRowSelect(id, checked) {
+            if (checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+            updateSelectionUI();
+        }
+
+        function toggleSelectAll(checked) {
+            if (checked) {
+                currentFilteredIds.forEach(id => selectedIds.add(id));
+            } else {
+                currentFilteredIds.forEach(id => selectedIds.delete(id));
+            }
+            renderTable();
+        }
+
+        function clearSelection() {
+            selectedIds.clear();
+            renderTable();
+        }
+
+        function updateSelectionUI() {
+            // 清理已不存在的 ID
+            const validIds = new Set(window.records.map(r => r.id));
+            for (let id of selectedIds) {
+                if (!validIds.has(id)) selectedIds.delete(id);
+            }
+
+            const bar = document.getElementById('bulkActionBar');
+            const badge = document.getElementById('selectedCountBadge');
+            const selectAllCb = document.getElementById('selectAllCheckbox');
+
+            if (selectedIds.size > 0) {
+                bar.classList.remove('hidden');
+                bar.classList.add('flex');
+                badge.innerText = `已选 ${selectedIds.size} 项`;
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+            }
+
+            if (selectAllCb) {
+                if (currentFilteredIds.length === 0) {
+                    selectAllCb.checked = false;
+                    selectAllCb.indeterminate = false;
+                } else {
+                    const selectedInView = currentFilteredIds.filter(id => selectedIds.has(id)).length;
+                    selectAllCb.checked = selectedInView === currentFilteredIds.length;
+                    selectAllCb.indeterminate = selectedInView > 0 && selectedInView < currentFilteredIds.length;
+                }
+            }
+        }
+
+        function bulkMarkReceived() {
+            if (selectedIds.size === 0) return;
+            const nowStr = formatDisplayDateTime(new Date());
+            let count = 0;
+            window.records.forEach(r => {
+                if (selectedIds.has(r.id) && !(r.receivedTime && String(r.receivedTime).trim())) {
+                    r.receivedTime = nowStr;
+                    count++;
+                }
+            });
+            if (count > 0) {
+                if (window.saveRecords) window.saveRecords();
+                window.showToast(`已批量标记签收 ${count} 件商品`, 'success');
+            } else {
+                window.showToast('所选订单均已处于签收状态', 'info');
+            }
+            selectedIds.clear();
+            renderTable();
+        }
+
+        function bulkDeleteRecords() {
+            if (selectedIds.size === 0) return;
+            if (!confirm(`确定要批量删除选中的 ${selectedIds.size} 条订单记录吗？此操作不可撤销。`)) return;
+            const delCount = selectedIds.size;
+            window.records = window.records.filter(r => !selectedIds.has(r.id));
+            selectedIds.clear();
+            if (window.saveRecords) window.saveRecords();
+            renderTable();
+            window.showToast(`已删除 ${delCount} 条订单记录`, 'info');
+        }
+
+        /* --- 4. 三点浮动菜单逻辑 --- */
+        function openRowActionMenu(event, id) {
+            event.stopPropagation();
+            const menu = document.getElementById('rowActionMenu');
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+
+            document.getElementById('menuDetailBtn').onclick = () => {
+                closeRowActionMenu();
+                openDetailModal(id);
+            };
+            document.getElementById('menuDeleteBtn').onclick = () => {
+                closeRowActionMenu();
+                askDeleteRecord(id);
+            };
+
+            menu.classList.remove('hidden');
+            const menuWidth = menu.offsetWidth || 144;
+            const menuHeight = menu.offsetHeight || 82;
+
+            let left = rect.right - menuWidth;
+            if (left < 12) left = 12;
+            let top = rect.bottom + 6;
+            if (top + menuHeight > window.innerHeight - 12) {
+                top = rect.top - menuHeight - 6;
+            }
+
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
+        }
+
+        function closeRowActionMenu() {
+            const menu = document.getElementById('rowActionMenu');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        /* --- 5. 详情弹窗与内部操作逻辑 --- */
         function openDetailModal(id) {
             const r = window.records.find(x => x.id === id);
             if (!r) return;
@@ -715,12 +850,38 @@
             document.getElementById('detailMyCourier').innerText = r.myCourier || '-';
             document.getElementById('detailMyTracking').innerText = r.myTracking || '未录入';
             document.getElementById('detailRemarks').innerText = r.remarks || '无';
+
+            // 动态渲染底部“标记签收 / 撤销签收”按钮
+            const rec = !!(r.receivedTime && String(r.receivedTime).trim());
+            const toggleBtn = document.getElementById('detailToggleReceiveBtn');
+            if (rec) {
+                toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5 border border-amber-500/40 bg-amber-500/15 text-amber-500 hover:bg-amber-500 hover:text-white";
+                toggleBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>撤销签收`;
+            } else {
+                toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white";
+                toggleBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>标记签收`;
+            }
+
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
         function closeDetailModal() {
             document.getElementById('detailModal').classList.add('hidden');
             currentDetailRecordId = null;
+        }
+
+        function toggleReceiveFromDetail() {
+            if (!currentDetailRecordId) return;
+            const id = currentDetailRecordId;
+            const r = window.records.find(x => x.id === id);
+            closeDetailModal();
+            if (!r) return;
+            const rec = !!(r.receivedTime && String(r.receivedTime).trim());
+            if (rec) {
+                unmarkReceived(id);
+            } else {
+                openMarkReceivedModal(id);
+            }
         }
 
         function editFromDetail() {
@@ -813,7 +974,10 @@
                 return mSearch && mStat;
             });
 
+            currentFilteredIds = list.map(r => r.id);
             updateStatistics(total);
+            updateSelectionUI();
+
             tbody.innerHTML = '';
             if (!list.length) { es.classList.remove('hidden'); es.classList.add('flex'); }
             else {
@@ -821,16 +985,16 @@
                 list.forEach(r => {
                     const rec = !!(r.receivedTime && String(r.receivedTime).trim());
                     const hl = map[(r.myTracking || '').trim()];
+                    const isChecked = selectedIds.has(r.id);
                     const tr = document.createElement('tr');
                     tr.style.borderColor = "var(--border-color)";
-                    tr.className = "hover:bg-violet-500/10 border-b transition-colors";
+                    tr.className = `${isChecked ? 'bg-violet-500/10' : ''} hover:bg-violet-500/10 border-b transition-colors`;
                     
-                    const isChecked = selectedIds.has(r.id);
                     tr.innerHTML = `
                         <td class="px-5 py-4">
                             <div class="font-medium text-xs font-bold flex gap-1"><span>${r.orderNum||'无'}</span></div>
                             <div style="color: var(--text-sub);" class="text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div>
-                            <!-- 在订单号下方新增一行，并在左侧放置多选复选框 -->
+                            <!-- 在订单号下方增加一行，左侧放置多选复选框 -->
                             <div class="mt-2 pt-1.5 border-t border-dashed" style="border-color: var(--border-color);">
                                 <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
                                     <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRowSelect('${r.id}', this.checked)" class="w-4 h-4 rounded accent-pink-500 cursor-pointer">
@@ -947,7 +1111,14 @@
             openFormModal();
         }
 
-        function askDeleteRecord(id) { if(confirm("确定要删除此订单记录？")) { window.records = window.records.filter(r=>r.id!==id); if(window.saveRecords) window.saveRecords(); renderTable(); } }
+        function askDeleteRecord(id) { 
+            if(confirm("确定要删除此订单记录？")) { 
+                window.records = window.records.filter(r=>r.id!==id); 
+                selectedIds.delete(id);
+                if(window.saveRecords) window.saveRecords(); 
+                renderTable(); 
+            } 
+        }
 
         function openMarkReceivedModal(id) {
             const r = window.records.find(x=>x.id===id); if(!r) return; recordToMarkReceivedId = id;
@@ -1001,12 +1172,22 @@
         }
 
         document.addEventListener('click', function(event) {
+            // 关闭导出下拉菜单
             const menu = document.getElementById('exportMenu');
             const button = event.target.closest('button[onclick="toggleExportMenu()"]');
             if (!button && menu && !menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
             }
+
+            // 关闭表格三点操作下拉菜单
+            const rowMenu = document.getElementById('rowActionMenu');
+            const rowBtn = event.target.closest('button[onclick^="openRowActionMenu"]');
+            if (!rowBtn && rowMenu && !rowMenu.classList.contains('hidden')) {
+                rowMenu.classList.add('hidden');
+            }
         });
+
+        window.addEventListener('scroll', closeRowActionMenu, true);
 
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.records, null, 2));
@@ -1047,24 +1228,50 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
+                let importedRecords;
                 try {
-                    const importedRecords = JSON.parse(e.target.result);
-                    if (Array.isArray(importedRecords)) {
-                        window.records = importedRecords;
-                        if (window.saveRecords) window.saveRecords();
-                        renderTable();
-                        window.showToast("成功导入数据并已同步至云端！", "success");
-                    } else {
-                        window.showToast("文件格式不正确！", "error");
+                    // 去除可能存在的 UTF-8 BOM 字符后再解析
+                    const cleanText = String(e.target.result || '').replace(/^\uFEFF/, '').trim();
+                    importedRecords = JSON.parse(cleanText);
+                } catch (parseErr) {
+                    console.error("JSON 语法解析错误:", parseErr);
+                    window.showToast("JSON 格式错误：" + parseErr.message, "error");
+                    return;
+                }
+
+                if (!Array.isArray(importedRecords)) {
+                    window.showToast("文件格式不正确：根节点必须是数组！", "error");
+                    return;
+                }
+
+                try {
+                    // 确保每条记录都有 id，防止多选或编辑异常
+                    window.records = importedRecords.map((item, idx) => ({
+                        ...item,
+                        id: item.id ? String(item.id) : `${Date.now()}_${idx}`
+                    }));
+
+                    if (typeof selectedIds !== 'undefined' && selectedIds instanceof Set) {
+                        selectedIds.clear();
                     }
-                } catch (err) {
-                    window.showToast("解析 JSON 文件失败", "error");
+
+                    if (typeof window.renderTable === 'function') {
+                        window.renderTable();
+                    }
+
+                    if (typeof window.saveRecords === 'function') {
+                        window.saveRecords();
+                    }
+
+                    window.showToast(`成功导入 ${window.records.length} 条记录！`, "success");
+                } catch (renderErr) {
+                    console.error("导入后渲染或同步错误:", renderErr);
+                    window.showToast("数据渲染异常：" + renderErr.message, "error");
                 }
             };
-            reader.readAsText(file);
+            reader.readAsText(file, 'UTF-8');
             event.target.value = '';
         };
-
         window.showToast = function(msg, type='info') {
             const c = document.getElementById('toastContainer'), t = document.createElement('div');
             t.className = `px-4 py-3 rounded-xl shadow-2xl border text-sm text-white transition-all transform translate-y-2 opacity-0 flex items-center gap-2 ${type==='success'?'bg-gradient-to-r from-violet-900 to-pink-900 border-pink-500/50':type==='error'?'bg-red-950 border-red-800/80':'bg-indigo-950 border-indigo-800/80'}`;
