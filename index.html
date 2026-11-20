@@ -240,20 +240,50 @@
                 </div>
             </section>
 
+            <!-- 批量操作浮动栏 (当勾选 >= 1 条订单时显示) -->
+            <div id="bulkActionBar" style="background-color: var(--bg-card); border-color: var(--border-color);" class="hidden p-3.5 rounded-2xl border shadow-lg flex-wrap items-center justify-between gap-3 border-l-4 border-l-pink-500 transition-all">
+                <div class="flex items-center gap-2 text-sm font-bold">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs bg-gradient-to-r from-violet-600 to-pink-500 text-white" id="selectedCountBadge">已选 0 项</span>
+                    <span style="color: var(--text-sub);" class="text-xs font-normal">可对选中的订单进行批量处理</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="bulkMarkReceived()" class="text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        批量标记签收
+                    </button>
+                    <button onclick="bulkDeleteRecords()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        批量删除
+                    </button>
+                    <button onclick="clearSelection()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-3 py-2 rounded-xl font-medium hover:opacity-80">
+                        取消选择
+                    </button>
+                </div>
+            </div>
+
             <!-- Table -->
             <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl border shadow-lg overflow-hidden">
                 <div class="overflow-x-auto custom-scrollbar">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
                             <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs font-semibold uppercase tracking-wider">
-                                <th class="px-5 py-4">订单号 & 下单时间</th>
-                                <th class="px-5 py-4">商品名称 & 规格</th>
-                                <th class="px-5 py-4 text-right">价格 (RM/¥)</th>
-                                <th class="px-5 py-4">中国物流</th>
-                                <th class="px-5 py-4">马来西亚物流</th>
-                                <th class="px-5 py-4">状态</th>
-                                <th class="px-5 py-4 text-center">用时</th>
-                                <th class="px-5 py-4 text-center">操作</th>
+                                <th class="px-5 pt-3.5 pb-2">订单号 & 下单时间</th>
+                                <th class="px-5 pt-3.5 pb-2">商品名称 & 规格</th>
+                                <th class="px-5 pt-3.5 pb-2 text-right">价格 (RM/¥)</th>
+                                <th class="px-5 pt-3.5 pb-2">中国物流</th>
+                                <th class="px-5 pt-3.5 pb-2">马来西亚物流</th>
+                                <th class="px-5 pt-3.5 pb-2">状态</th>
+                                <th class="px-5 pt-3.5 pb-2 text-center">用时</th>
+                                <th class="px-5 pt-3.5 pb-2 text-center">操作</th>
+                            </tr>
+                            <!-- 新增表头第二行：在“订单号”下方左侧放置“全选”+ 复选框 -->
+                            <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs">
+                                <th class="px-5 py-2" colspan="8">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer select-none font-semibold">
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 rounded accent-pink-500 cursor-pointer">
+                                        <span>全选</span>
+                                    </label>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="recordsTableBody" class="divide-y text-sm"></tbody>
@@ -346,21 +376,23 @@
                     <div><span style="color: var(--text-sub);" class="text-xs block">备注</span><span id="detailRemarks" class="text-xs">-</span></div>
                 </div>
             </div>
-            <!-- 弹窗底部操作区：修改商品与红底白字删除商品 -->
-            <div style="border-color: var(--border-color); background-color: var(--bg-sub);" class="px-6 py-4 border-t flex items-center justify-between">
+            <!-- 弹窗底部操作区：删除订单、标记/撤销签收、编辑订单 -->
+            <div style="border-color: var(--border-color); background-color: var(--bg-sub);" class="px-6 py-4 border-t flex flex-wrap items-center justify-between gap-2">
                 <!-- 红底白字删除按钮 -->
-                <button onclick="deleteFromDetail()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: trash -->
+                <button onclick="deleteFromDetail()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    删除商品
+                    删除订单
                 </button>
-                <div class="flex items-center gap-2">
-                    <button onclick="closeDetailModal()" style="background-color: var(--bg-card); border-color: var(--border-color);" class="border px-4 py-2 rounded-xl text-xs font-medium">关闭</button>
-                    <button onclick="editFromDetail()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: pencil-alt -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        修改商品
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- 标记签收 / 撤销签收 动态按钮 -->
+                    <button id="detailToggleReceiveBtn" onclick="toggleReceiveFromDetail()" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5">
+                        <!-- 由 JS 根据当前签收状态动态渲染 -->
                     </button>
+                    <button onclick="editFromDetail()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md inline-flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        编辑订单
+                    </button>
+                    <button onclick="closeDetailModal()" style="background-color: var(--bg-card); border-color: var(--border-color);" class="border px-3.5 py-2 rounded-xl text-xs font-medium">关闭</button>
                 </div>
             </div>
         </div>
@@ -793,8 +825,19 @@
                     tr.style.borderColor = "var(--border-color)";
                     tr.className = "hover:bg-violet-500/10 border-b transition-colors";
                     
+                    const isChecked = selectedIds.has(r.id);
                     tr.innerHTML = `
-                        <td class="px-5 py-4"><div class="font-medium text-xs font-bold flex gap-1"><span>${r.orderNum||'无'}</span></div><div style="color: var(--text-sub);" class="text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div></td>
+                        <td class="px-5 py-4">
+                            <div class="font-medium text-xs font-bold flex gap-1"><span>${r.orderNum||'无'}</span></div>
+                            <div style="color: var(--text-sub);" class="text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div>
+                            <!-- 在订单号下方新增一行，并在左侧放置多选复选框 -->
+                            <div class="mt-2 pt-1.5 border-t border-dashed" style="border-color: var(--border-color);">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRowSelect('${r.id}', this.checked)" class="w-4 h-4 rounded accent-pink-500 cursor-pointer">
+                                    <span style="color: var(--text-sub);" class="text-[11px]">选择</span>
+                                </label>
+                            </div>
+                        </td>
                         <td class="px-5 py-4"><div class="font-semibold">${r.productName||''}</div><div style="color: var(--text-sub);" class="text-xs max-w-xs truncate">${r.description||''}</div></td>
                         <td class="px-5 py-4 text-right"><div class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500">RM ${parseFloat(r.priceMYR||0).toFixed(2)}</div><div style="color: var(--text-sub);" class="text-xs font-sans">¥ ${r.priceRMB||'-'}</div></td>
                         <td class="px-5 py-4"><div class="text-xs font-medium">${r.cnCourier||'-'}</div><div style="color: var(--text-sub);" class="text-xs mt-1 font-sans">${r.cnTracking||'-'}</div></td>
@@ -805,21 +848,22 @@
                         </td>
                         <td class="px-5 py-4">
                             ${rec 
-                                ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>已签收</span><div style="color: var(--text-sub);" class="text-[11px] mt-1">${formatDisplayDateTime(r.receivedTime)}</div>` 
-                                : `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>待签收</span>`}
+                                ? `<div class="flex items-center gap-1.5">
+                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>已签收</span>
+                                       <button onclick="unmarkReceived('${r.id}')" title="撤销签收" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-1 rounded-lg border hover:border-amber-500 text-amber-500 transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                                   </div>
+                                   <div style="color: var(--text-sub);" class="text-[11px] mt-1">${formatDisplayDateTime(r.receivedTime)}</div>` 
+                                : `<div class="flex items-center gap-1.5">
+                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>待签收</span>
+                                       <button onclick="openMarkReceivedModal('${r.id}')" title="标记签收" class="p-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></button>
+                                   </div>`}
                         </td>
                         <td class="px-5 py-4 text-center text-xs font-medium">${rec ? `用时 ${calculateDeliveryDays(r.orderTime, r.receivedTime)} 天` : `已等 ${calculateDeliveryDays(r.orderTime, null)} 天`}</td>
                         <td class="px-5 py-4 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                ${rec 
-                                    ? `<button onclick="unmarkReceived('${r.id}')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-2 py-1 rounded hover:opacity-80 transition-colors inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>撤销签收</button>` 
-                                    : `<button onclick="openMarkReceivedModal('${r.id}')" class="text-xs bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-2.5 py-1 rounded hover:from-emerald-500 hover:to-teal-500 font-medium transition-all inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>标记签收</button>`}
-                                <!-- 详情按钮 (Heroicon v1 outline: information-circle) -->
-                                <button onclick="openDetailModal('${r.id}')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-2.5 py-1 rounded hover:border-pink-500 transition-colors font-medium inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    详情
-                                </button>
-                            </div>
+                            <!-- 精简为单个三点按钮 (Heroicon v1 outline: dots-vertical) -->
+                            <button onclick="openRowActionMenu(event, '${r.id}')" title="更多操作" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-2 rounded-xl border hover:border-pink-500 transition-colors inline-flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                            </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
