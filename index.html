@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,61 +15,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS 色彩变量系统：实现浅色与深色无缝切换 */
-        :root {
-            /* 1. 浅色模式极光渐变背景：浅蓝 ➡️ 薄荷绿 ➡️ 柔软浅红 */
-            --bg-body: linear-gradient(145deg, #DCEEFB 0%, #E6F8F6 30%, #FFF1F2 80%);
-            --bg-card: #FFFFFF;
-            --bg-sub: #EBF4F6;
-            --bg-input: #F8FAFC;
-            --text-main: #0F172A;
-            --text-sub: #475569;
-            --border-color: #CBD5E1;
-            --table-hover: #F1F5F9;
-            --modal-overlay: rgba(15, 23, 42, 0.4);
-        }
-
-        html.dark {
-            /* 2. 深色模式背景 */
-            --bg-body: #0A0B10;
-            --bg-card: #14132B;
-            --bg-sub: #1C1947;
-            --bg-input: #0A0B10;
-            --text-main: #E2E8F0;
-            --text-sub: #94A3B8;
-            --border-color: rgba(49, 46, 129, 0.6);
-            --table-hover: rgba(139, 92, 246, 0.1);
-            --modal-overlay: rgba(2, 6, 23, 0.75);
-        }
-
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background: var(--bg-body); 
-            background-attachment: fixed; /* 锁定背景，防止长滚动断层 */
-            color: var(--text-main);
-            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8B5CF6; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F8FAFC; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
         .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
         
         .flatpickr-calendar {
-            background: var(--bg-card) !important;
+            background: #FFFFFF !important;
             border-radius: 1rem !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12) !important;
+            border: 1px solid #E2E8F0 !important;
             font-family: 'Inter', sans-serif !important;
-            color: var(--text-main) !important;
+            color: #1E293B !important;
         }
-        .flatpickr-day { color: var(--text-main) !important; }
-        .flatpickr-day.selected { background: linear-gradient(135deg, #8B5CF6, #EC4899) !important; border-color: transparent !important; color: #FFF !important; }
-        .flatpickr-months .flatpickr-month, .flatpickr-current-month .flatpickr-monthDropdown-months, span.flatpickr-weekday { color: var(--text-main) !important; fill: var(--text-main) !important; }
+        .flatpickr-day.selected { 
+            background: linear-gradient(135deg, #059669, #0284C7) !important; 
+            border-color: transparent !important; 
+            color: #FFFFFF !important; 
+        }
     </style>
 </head>
-<body class="min-h-screen pb-16">
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-16 antialiased">
 
     <!-- Toast Notification -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
@@ -88,166 +60,155 @@
         </button>
     </div>
 
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
+    <!-- 顶部通栏主题色 Banner：绿渐变蓝 -->
+    <header class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+            <!-- 上半部分：主标题、副标题与右侧实时信息 -->
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                    <div class="bg-white p-1.5 rounded-xl shadow-sm shrink-0 mt-0.5">
+                        <img src="images/pinduoduo-seeklogo.svg" 
+                             onerror="this.onerror=null; this.src='https://jiebochua-tech.github.io/Pinduoduotracking/images/pinduoduo-seeklogo.svg';" 
+                             alt="拼多多" 
+                             class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">拼多多网购记录</h1>
+                            <span class="text-xs bg-white/15 text-white border border-white/25 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 font-medium">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                                云端同步
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-teal-50/90 mt-1">中国 ➔ 马来西亚 · 双币种记录 · 集包物流追踪</p>
+                    </div>
+                </div>
 
-        <!-- Top Header Bar -->
-        <header style="background-color: var(--bg-card); border-color: var(--border-color);" class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl shadow-lg border transition-all">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                    <!-- 拼多多官方 SVG Logo -->
-                    <img src="images/pinduoduo-seeklogo.svg" 
-                         onerror="this.onerror=null; this.src='https://jiebochua-tech.github.io/Pinduoduotracking/images/pinduoduo-seeklogo.svg';" 
-                         alt="拼多多" 
-                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-contain shadow-sm shrink-0">
-                    <span>拼多多网购记录</span>
-                    <span class="text-xs bg-gradient-to-r from-violet-500/20 to-pink-500/20 text-pink-500 dark:text-pink-300 border border-pink-500/30 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                        <!-- Heroicon v1 outline: cloud -->
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                        云端同步
-                    </span>
-                </h1>
-                <div class="flex items-center gap-2 mt-3">
-                    <button id="navTab1" onclick="switchPage('records')" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: clipboard-list -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <!-- 右上角实时时间与云同步状态提示 -->
+                <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 text-xs text-teal-50/90 shrink-0">
+                    <div id="liveClockText" class="font-mono font-medium"></div>
+                    <div id="headerAuthStatus" class="text-[11px] bg-white/15 px-2.5 py-0.5 rounded-full border border-white/20">未登录云端</div>
+                </div>
+            </div>
+
+            <!-- 下半部分：操作按钮组 + 页面视图切换 -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <!-- 左侧功能操作按钮（磨砂白主按钮 + 纯白实心次按钮） -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="openFormModal()" class="bg-white/20 hover:bg-white/30 active:bg-white/35 text-white border border-white/30 font-semibold px-3.5 py-2 rounded-lg text-xs transition-all inline-flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        新增网购订单
+                    </button>
+
+                    <!-- 导出数据 Dropdown -->
+                    <div class="relative inline-block text-left">
+                        <button onclick="toggleExportMenu()" class="bg-white hover:bg-slate-50 text-slate-800 font-semibold px-3.5 py-2 rounded-lg text-xs shadow-sm transition-all inline-flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            导出数据
+                        </button>
+                        <div id="exportMenu" class="hidden absolute left-0 z-20 mt-2 w-36 origin-top-left bg-white rounded-xl shadow-xl border border-slate-200 text-slate-700 focus:outline-none overflow-hidden">
+                            <button onclick="exportDataJSON(); toggleExportMenu()" class="w-full text-left px-4 py-2.5 text-xs hover:bg-teal-50 hover:text-teal-700 font-semibold border-b border-slate-100 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                                JSON 备份
+                            </button>
+                            <button onclick="exportDataCSV(); toggleExportMenu()" class="w-full text-left px-4 py-2.5 text-xs hover:bg-blue-50 hover:text-blue-700 font-semibold flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                CSV 表格
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 导入备份按钮 -->
+                    <label class="bg-white hover:bg-slate-50 text-slate-800 font-semibold px-3.5 py-2 rounded-lg text-xs shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        导入 JSON
+                        <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
+                    </label>
+
+                    <!-- 系统设置按钮 -->
+                    <button onclick="openSettingsModal()" class="bg-white hover:bg-slate-50 text-slate-800 font-semibold px-3.5 py-2 rounded-lg text-xs shadow-sm transition-all inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        系统设置
+                    </button>
+                </div>
+
+                <!-- 右侧视图切换胶囊（订单明细表 / 月度理财统计） -->
+                <div class="flex items-center gap-1.5 bg-black/15 p-1 rounded-xl border border-white/15">
+                    <button id="navTab1" onclick="switchPage('records')" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-teal-700 shadow-sm inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                         订单明细表
                     </button>
-                    <button id="navTab2" onclick="switchPage('analytics')" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all border opacity-80 hover:opacity-100 inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: chart-bar -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <button id="navTab2" onclick="switchPage('analytics')" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-white/90 hover:bg-white/15 inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         月度理财统计
                     </button>
                 </div>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="openFormModal()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-medium px-4 py-2.5 rounded-xl text-sm shadow-md shadow-purple-500/20 transition-all inline-flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: plus -->
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    新增网购订单
-                </button>
-                
-                <!-- 导出数据 Dropdown -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleExportMenu()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border font-medium px-4 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-1.5 hover:border-violet-500">
-                        <!-- Heroicon v1 outline: download -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        导出数据
-                    </button>
-                    <div id="exportMenu" style="background-color: var(--bg-card); border-color: var(--border-color);" class="hidden absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-xl shadow-2xl border focus:outline-none overflow-hidden">
-                        <button onclick="exportDataJSON(); toggleExportMenu()" style="border-color: var(--border-color);" class="w-full text-left px-4 py-3 text-sm hover:bg-violet-500/10 font-medium border-b flex items-center gap-2">
-                            <!-- Heroicon v1 outline: code -->
-                            <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                            JSON 备份
-                        </button>
-                        <button onclick="exportDataCSV(); toggleExportMenu()" class="w-full text-left px-4 py-3 text-sm hover:bg-violet-500/10 font-medium flex items-center gap-2">
-                            <!-- Heroicon v1 outline: table -->
-                            <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            CSV 表格
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- 导入备份按钮 -->
-                <label style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border font-medium px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer inline-flex items-center gap-1.5 hover:border-violet-500">
-                    <!-- Heroicon v1 outline: upload -->
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    导入备份
-                    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
-                </label>
-                
-                <!-- 设置按钮 -->
-                <div style="border-color: var(--border-color);" class="pl-3 border-l ml-1">
-                    <button onclick="openSettingsModal()" title="系统设置" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border p-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center hover:border-pink-500">
-                        <!-- Heroicon v1 outline: cog -->
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </header>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         <!-- 第 1 页：订单管理区域 -->
         <div id="pageRecords" class="space-y-6">
-            <!-- Stats Dashboard -->
-            <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: currency-dollar -->
-                        <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        总网购支出
-                    </span>
-                    <div class="mt-2">
-                        <div class="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500" id="statTotalMYR">RM 0.00</div>
-                        <div style="color: var(--text-sub);" class="text-xs font-medium mt-0.5" id="statTotalRMB">¥ 0.00</div>
+            <!-- Stats Dashboard（4 列纯白卡片 + 灰色投影，对齐参考图） -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500">总网购支出 (RM)</span>
+                    <div class="my-2">
+                        <div class="text-2xl font-extrabold text-teal-600" id="statTotalMYR">RM 0.00</div>
                     </div>
+                    <div class="text-[11px] text-slate-400 font-medium" id="statTotalRMB">折合人民币 ¥ 0.00</div>
                 </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: shopping-bag -->
-                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        订单总数量
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold" id="statTotalItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">笔记录</span>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500">订单总数</span>
+                    <div class="my-2 flex items-baseline gap-1.5">
+                        <span class="text-2xl font-extrabold text-slate-900" id="statTotalItems">0</span>
+                        <span class="text-xs text-slate-500 font-medium">笔</span>
                     </div>
+                    <div class="text-[11px] text-slate-400">所有已记录订单</div>
                 </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-amber-500">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: clock -->
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        待签收包裹
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-amber-500" id="statPendingItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">件在途</span>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500">待签收 / 已签收</span>
+                    <div class="my-2 flex items-baseline gap-2 text-2xl font-extrabold">
+                        <span class="text-amber-500" id="statPendingItems">0</span>
+                        <span class="text-slate-300 font-normal">/</span>
+                        <span class="text-emerald-600" id="statReceivedItems">0</span>
                     </div>
+                    <div class="text-[11px] text-slate-400">根据签收时间自动统计</div>
                 </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-emerald-500">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: check-circle -->
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        已签收包裹
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-emerald-500" id="statReceivedItems">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">件妥投</span>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500">集包组数</span>
+                    <div class="my-2 flex items-baseline gap-1.5">
+                        <span class="text-2xl font-extrabold text-blue-600" id="statDuplicateGroups">0</span>
+                        <span class="text-xs text-slate-500 font-medium">组</span>
                     </div>
-                </div>
-                <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-5 rounded-2xl border shadow-lg flex flex-col justify-between border-l-4 border-l-sky-500 col-span-2 sm:col-span-1">
-                    <span style="color: var(--text-sub);" class="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: collection -->
-                        <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        集包组数
-                    </span>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-bold text-sky-500" id="statDuplicateGroups">0</span>
-                        <span style="color: var(--text-sub);" class="text-xs">组重号</span>
-                    </div>
+                    <div class="text-[11px] text-slate-400">同单号合并派送自动识别</div>
                 </div>
             </section>
 
             <!-- Search & Filters -->
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-4 rounded-2xl border shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+            <section class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="relative w-full md:w-96">
-                    <!-- Heroicon v1 outline: search -->
-                    <svg style="color: var(--text-sub);" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" oninput="renderTable()" placeholder="搜索产品、订单号、快递单号..." style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-10 pr-4 py-2.5 text-sm border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all">
+                    <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" oninput="renderTable()" placeholder="搜索产品、订单号、快递单号..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all">
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <label style="color: var(--text-sub);" class="text-sm font-medium whitespace-nowrap inline-flex items-center gap-1">
-                        <!-- Heroicon v1 outline: filter -->
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    <label class="text-xs font-semibold text-slate-500 whitespace-nowrap inline-flex items-center gap-1">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                         筛选:
                     </label>
-                    <select id="statusFilter" onchange="renderTable()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full md:w-44 px-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                    <select id="statusFilter" onchange="renderTable()" class="w-full md:w-44 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                         <option value="ALL">全部订单</option>
                         <option value="PENDING">待签收</option>
                         <option value="RECEIVED">已签收</option>
                         <option value="BUNDLED">集包派送</option>
                     </select>
-                    <button onclick="resetFilters()" class="text-xs text-pink-500 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
-                        <!-- Heroicon v1 outline: refresh -->
+                    <button onclick="resetFilters()" class="text-xs font-semibold text-teal-600 hover:text-teal-700 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         重置
                     </button>
@@ -255,32 +216,32 @@
             </section>
 
             <!-- 批量操作浮动栏 (当勾选 >= 1 条订单时显示) -->
-            <div id="bulkActionBar" style="background-color: var(--bg-card); border-color: var(--border-color);" class="hidden p-3.5 rounded-2xl border shadow-lg flex-wrap items-center justify-between gap-3 border-l-4 border-l-pink-500 transition-all">
+            <div id="bulkActionBar" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex-wrap items-center justify-between gap-3 border-l-4 border-l-teal-600 transition-all">
                 <div class="flex items-center gap-2 text-sm font-bold">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs bg-gradient-to-r from-violet-600 to-pink-500 text-white" id="selectedCountBadge">已选 0 项</span>
-                    <span style="color: var(--text-sub);" class="text-xs font-normal">可对选中的订单进行批量处理</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs bg-teal-600 text-white" id="selectedCountBadge">已选 0 项</span>
+                    <span class="text-xs font-normal text-slate-500">可对选中的订单进行批量处理</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="bulkMarkReceived()" class="text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
+                    <button onclick="bulkMarkReceived()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         批量标记签收
                     </button>
-                    <button onclick="bulkDeleteRecords()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
+                    <button onclick="bulkDeleteRecords()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3.5 py-2 rounded-xl transition-all inline-flex items-center gap-1 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         批量删除
                     </button>
-                    <button onclick="clearSelection()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="text-xs border px-3 py-2 rounded-xl font-medium hover:opacity-80">
+                    <button onclick="clearSelection()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-medium transition-colors">
                         取消选择
                     </button>
                 </div>
             </div>
 
             <!-- Table -->
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl border shadow-lg overflow-hidden">
+            <section class="bg-white rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 overflow-hidden">
                 <div class="overflow-x-auto custom-scrollbar">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs font-semibold uppercase tracking-wider">
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 <th class="px-5 pt-3.5 pb-2">订单号 & 下单时间</th>
                                 <th class="px-5 pt-3.5 pb-2">商品名称 & 规格</th>
                                 <th class="px-5 pt-3.5 pb-2 text-right">价格 (RM/¥)</th>
@@ -290,23 +251,21 @@
                                 <th class="px-5 pt-3.5 pb-2 text-center">用时</th>
                                 <th class="px-5 pt-3.5 pb-2 text-center">操作</th>
                             </tr>
-                            <!-- 在“订单号 & 下单时间”行下方增加一行，在左侧提供“全选”+ 复选框 -->
-                            <tr style="background-color: var(--bg-sub); border-color: var(--border-color);" class="border-b text-xs">
+                            <tr class="bg-slate-50/80 border-b border-slate-200 text-xs text-slate-600">
                                 <th class="px-5 py-2" colspan="8">
                                     <label class="inline-flex items-center gap-2 cursor-pointer select-none font-semibold">
-                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 rounded accent-pink-500 cursor-pointer">
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 rounded accent-teal-600 cursor-pointer">
                                         <span>全选</span>
                                     </label>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="recordsTableBody" class="divide-y text-sm"></tbody>
+                        <tbody id="recordsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
                     </table>
                     <!-- Empty State -->
-                    <div id="emptyState" style="color: var(--text-sub);" class="hidden flex-col items-center justify-center py-16">
-                        <!-- Heroicon v1 outline: inbox -->
-                        <svg class="w-16 h-16 opacity-40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                        <p class="font-medium">暂无记录，或需登录后同步云端</p>
+                    <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-slate-400">
+                        <svg class="w-14 h-14 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <p class="font-medium text-sm">暂无记录，或需前往「系统设置」登录后同步云端</p>
                     </div>
                 </div>
             </section>
@@ -506,64 +465,46 @@
         </div>
     </div>
 
-    <!-- Settings Modal (包含主题设置、汇率设置与登录) -->
-    <div id="settingsModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-sm p-6 space-y-5">
-            <div style="border-color: var(--border-color);" class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                    <!-- Heroicon v1 outline: adjustments -->
-                    <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+    <!-- Settings Modal (汇率设置与云同步账号) -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                     系统设置
                 </h3>
-                <button onclick="closeSettingsModal()" style="color: var(--text-sub);">
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
             <div class="space-y-4">
-                <!-- 1. 外观主题设置 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-2">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: color-swatch -->
-                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-                        外观主题
-                    </label>
-                    <select id="themeSelect" onchange="changeTheme(this.value)" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
-                        <option value="system">跟随系统 (System)</option>
-                        <option value="dark">深色模式 (Dark)</option>
-                        <option value="light">浅色模式 (Light)</option>
-                    </select>
-                </div>
-
-                <!-- 2. 人民币兑马币汇率设置 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-2">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: currency-dollar -->
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <!-- 1. 人民币兑马币汇率设置 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 uppercase">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         默认汇率 (1 RMB = ? MYR)
                     </label>
                     <div class="flex items-center gap-2">
-                        <input type="number" step="0.001" id="exchangeRateInput" onchange="updateExchangeRate(this.value)" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono outline-none focus:ring-2 focus:ring-pink-500" placeholder="0.65">
-                        <span style="color: var(--text-sub);" class="text-xs font-bold whitespace-nowrap">RM/¥</span>
+                        <input type="number" step="0.001" id="exchangeRateInput" onchange="updateExchangeRate(this.value)" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500" placeholder="0.65">
+                        <span class="text-xs font-bold text-slate-500 whitespace-nowrap">RM/¥</span>
                     </div>
-                    <span style="color: var(--text-sub);" class="text-[11px] block">修改后自动作用于新创建订单的汇率自动换算。</span>
+                    <span class="text-[11px] text-slate-400 block">修改后自动作用于新创建订单的汇率自动换算。</span>
                 </div>
 
-                <!-- 3. 云同步账号 -->
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-4 rounded-xl border space-y-3">
-                    <label style="color: var(--text-sub);" class="flex items-center gap-1.5 text-xs font-semibold uppercase">
-                        <!-- Heroicon v1 outline: cloud -->
-                        <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                <!-- 2. 云同步账号 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 uppercase">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
                         账号云同步
                     </label>
-                    <div class="flex flex-col gap-3">
-                        <div id="user-info" class="text-[13px] font-medium text-pink-500 hidden text-center bg-violet-500/10 py-1.5 rounded-lg border border-pink-500/30"></div>
-                        <button id="login-btn" onclick="loginWithGoogle(); closeSettingsModal()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full border px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2">
+                    <div class="flex flex-col gap-2.5">
+                        <div id="user-info" class="text-xs font-semibold text-teal-700 hidden text-center bg-teal-50 py-2 rounded-lg border border-teal-200"></div>
+                        <button id="login-btn" onclick="loginWithGoogle(); closeSettingsModal()" class="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-colors">
                             <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                            Google 账号登录
+                            使用 Google 账号登录
                         </button>
-                        <button id="logout-btn" onclick="logoutGoogle(); closeSettingsModal()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full border px-4 py-2.5 rounded-xl text-sm hidden transition-colors inline-flex items-center justify-center gap-1.5">
-                            <!-- Heroicon v1 outline: logout -->
+                        <button id="logout-btn" onclick="logoutGoogle(); closeSettingsModal()" class="w-full bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 px-4 py-2 rounded-xl text-xs font-semibold hidden transition-colors inline-flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                             退出当前账号
                         </button>
@@ -655,43 +596,21 @@
 
         document.addEventListener('DOMContentLoaded', () => { 
             initFlatpickrPickers(); 
-            initTheme();
+            startLiveClock();
             document.getElementById('exchangeRateInput').value = window.RMB_TO_MYR_RATE;
         });
 
-        /* --- 1. 主题切换逻辑 (深色 / 浅色 / 跟随系统) --- */
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pdd_theme') || 'system';
-            document.getElementById('themeSelect').value = savedTheme;
-            applyTheme(savedTheme);
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('pdd_theme') || 'system') === 'system') {
-                    applyTheme('system');
-                }
-            });
-        }
-
-        function changeTheme(mode) {
-            localStorage.setItem('pdd_theme', mode);
-            applyTheme(mode);
-            window.showToast(`主题切换为：${mode==='light'?'浅色模式':mode==='dark'?'深色模式':'跟随系统'}`, 'success');
-        }
-
-        function applyTheme(mode) {
-            const root = document.documentElement;
-            if (mode === 'light') {
-                root.classList.remove('dark');
-            } else if (mode === 'dark') {
-                root.classList.add('dark');
-            } else {
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    root.classList.add('dark');
-                } else {
-                    root.classList.remove('dark');
-                }
-            }
-            if(expenseChartInstance) renderMonthlyChart();
+        /* --- 1. 顶栏本地时间实时显示 --- */
+        function startLiveClock() {
+            const el = document.getElementById('liveClockText');
+            if (!el) return;
+            const update = () => {
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                el.innerText = `本地时间: ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            };
+            update();
+            setInterval(update, 1000);
         }
 
         /* --- 2. 汇率设置逻辑 --- */
