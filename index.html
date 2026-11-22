@@ -61,8 +61,8 @@
     <!-- 顶部通栏主题色 Banner：绿渐变蓝 -->
     <header class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
-            <!-- 上半部分：主标题、副标题与右侧实时信息 -->
-            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <!-- 上半部分：主标题、副标题与右上角齿轮设置按钮 -->
+            <div class="flex items-start justify-between gap-4">
                 <div class="flex items-start gap-3.5">
                     <div class="bg-white p-1.5 rounded-xl shadow-sm shrink-0 mt-0.5">
                         <img src="images/pinduoduo-seeklogo.svg" 
@@ -120,7 +120,7 @@
 
         <!-- 第 1 页：订单管理区域 -->
         <div id="pageRecords" class="space-y-6">
-            <!-- Stats Dashboard（4 列纯白卡片 + 灰色投影，对齐参考图） -->
+            <!-- Stats Dashboard（4 列纯白卡片 + 灰色投影） -->
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 flex flex-col justify-between">
                     <span class="text-xs font-semibold text-slate-500">总网购支出 (RM)</span>
@@ -233,7 +233,7 @@
                     <!-- Empty State -->
                     <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-slate-400">
                         <svg class="w-14 h-14 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 00-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                        <p class="font-medium text-sm">暂无记录，或需前往「系统设置」登录后同步云端</p>
+                        <p class="font-medium text-sm">暂无记录，或需前往右上角设置登录后同步云端</p>
                     </div>
                 </div>
             </section>
@@ -241,18 +241,17 @@
 
         <!-- 第 2 页：统计区域 -->
         <div id="pageAnalytics" class="hidden space-y-6">
-            <section style="background-color: var(--bg-card); border-color: var(--border-color);" class="p-6 rounded-2xl border shadow-lg space-y-4">
-                <div style="border-color: var(--border-color);" class="flex justify-between border-b pb-4">
+            <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/70 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                     <div>
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <!-- Heroicon v1 outline: presentation-chart-bar -->
-                            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                             月度网购支出趋势 (RM)
                         </h2>
                     </div>
                     <div class="text-right">
-                        <span style="color: var(--text-sub);" class="text-xs">历史累计折合支出</span>
-                        <div class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500" id="analyticsTotalMYR">RM 0.00</div>
+                        <span class="text-xs text-slate-500">历史累计折合支出</span>
+                        <div class="text-xl font-extrabold text-teal-600" id="analyticsTotalMYR">RM 0.00</div>
                     </div>
                 </div>
                 <div class="relative w-full h-[380px] pt-2"><canvas id="monthlyExpenseChart"></canvas></div>
@@ -263,140 +262,133 @@
     <!-- Modals -->
 
     <!-- 商品详情 Modal (Info Modal) -->
-    <div id="detailModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-xl overflow-hidden">
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-6 py-4 border-b flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                    <!-- Heroicon v1 outline: cube -->
-                    <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     订单详细信息
                 </h3>
-                <button onclick="closeDetailModal()" style="color: var(--text-sub);" class="hover:opacity-80">
-                    <!-- Heroicon v1 outline: x -->
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-6 space-y-4 text-sm">
+            <div class="p-6 space-y-4 text-sm text-slate-800">
                 <!-- 基本与价格 -->
-                <div style="background-color: var(--bg-input); border-color: var(--border-color);" class="p-4 rounded-xl border grid grid-cols-2 gap-3">
-                    <div><span style="color: var(--text-sub);" class="text-xs block">订单号</span><span id="detailOrderNum" class="font-mono font-bold text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">下单时间</span><span id="detailOrderTime" class="font-mono text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">价格 (RM)</span><span id="detailPriceMYR" class="font-bold text-violet-500">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">价格 (RMB)</span><span id="detailPriceRMB" class="font-mono text-xs">-</span></div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 grid grid-cols-2 gap-3">
+                    <div><span class="text-slate-400 text-xs block">订单号</span><span id="detailOrderNum" class="font-mono font-bold text-xs text-slate-800">-</span></div>
+                    <div><span class="text-slate-400 text-xs block">下单时间</span><span id="detailOrderTime" class="font-mono text-xs text-slate-700">-</span></div>
+                    <div><span class="text-slate-400 text-xs block">价格 (RM)</span><span id="detailPriceMYR" class="font-bold text-teal-600">-</span></div>
+                    <div><span class="text-slate-400 text-xs block">价格 (RMB)</span><span id="detailPriceRMB" class="font-mono text-xs text-slate-700">-</span></div>
                 </div>
                 <!-- 商品名称与规格 -->
                 <div>
-                    <span style="color: var(--text-sub);" class="text-xs block">商品名称</span>
-                    <div id="detailProductName" class="font-bold text-base mt-0.5">-</div>
-                    <div id="detailDescription" style="color: var(--text-sub);" class="text-xs mt-1">-</div>
+                    <span class="text-slate-400 text-xs block">商品名称</span>
+                    <div id="detailProductName" class="font-bold text-base text-slate-900 mt-0.5">-</div>
+                    <div id="detailDescription" class="text-slate-500 text-xs mt-1">-</div>
                 </div>
                 <!-- 物流信息 -->
                 <div class="grid grid-cols-2 gap-4 pt-2">
-                    <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3 rounded-xl border">
-                        <span class="text-xs font-semibold text-purple-400 flex items-center gap-1 mb-1">
-                            <!-- Heroicon v1 outline: truck -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <span class="text-xs font-semibold text-teal-600 flex items-center gap-1 mb-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
                             中国物流 (CN)
                         </span>
-                        <div id="detailCnCourier" class="font-medium text-xs">-</div>
-                        <div id="detailCnTracking" class="font-mono text-xs mt-0.5 break-all">-</div>
+                        <div id="detailCnCourier" class="font-medium text-xs text-slate-800">-</div>
+                        <div id="detailCnTracking" class="font-mono text-xs text-slate-500 mt-0.5 break-all">-</div>
                     </div>
-                    <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3 rounded-xl border">
-                        <span class="text-xs font-semibold text-pink-400 flex items-center gap-1 mb-1">
-                            <!-- Heroicon v1 outline: truck -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <span class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
                             大马物流 (MY)
                         </span>
-                        <div id="detailMyCourier" class="font-medium text-xs">-</div>
-                        <div id="detailMyTracking" class="font-mono text-xs mt-0.5 break-all">-</div>
+                        <div id="detailMyCourier" class="font-medium text-xs text-slate-800">-</div>
+                        <div id="detailMyTracking" class="font-mono text-xs text-slate-500 mt-0.5 break-all">-</div>
                     </div>
                 </div>
                 <!-- 备注与其他 -->
                 <div class="grid grid-cols-2 gap-3 pt-1">
-                    <div><span style="color: var(--text-sub);" class="text-xs block">签收时间</span><span id="detailReceivedTime" class="font-mono text-xs">-</span></div>
-                    <div><span style="color: var(--text-sub);" class="text-xs block">备注</span><span id="detailRemarks" class="text-xs">-</span></div>
+                    <div><span class="text-slate-400 text-xs block">签收时间</span><span id="detailReceivedTime" class="font-mono text-xs text-slate-700">-</span></div>
+                    <div><span class="text-slate-400 text-xs block">备注</span><span id="detailRemarks" class="text-xs text-slate-700">-</span></div>
                 </div>
             </div>
             <!-- 弹窗底部操作区：删除订单、标记/撤销签收、编辑订单 -->
-            <div style="border-color: var(--border-color); background-color: var(--bg-sub);" class="px-6 py-4 border-t flex flex-wrap items-center justify-between gap-2">
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                 <!-- 红底白字删除按钮 -->
-                <button onclick="deleteFromDetail()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: trash -->
+                <button onclick="deleteFromDetail()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     删除订单
                 </button>
                 <div class="flex flex-wrap items-center gap-2">
                     <!-- 标记签收 / 撤销签收 动态按钮 -->
                     <button id="detailToggleReceiveBtn" onclick="toggleReceiveFromDetail()" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5"></button>
-                    <button onclick="editFromDetail()" class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: pencil-alt -->
+                    <button onclick="editFromDetail()" class="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         编辑订单
                     </button>
-                    <button onclick="closeDetailModal()" style="background-color: var(--bg-card); border-color: var(--border-color);" class="border px-3.5 py-2 rounded-xl text-xs font-medium">关闭</button>
+                    <button onclick="closeDetailModal()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors">关闭</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Add/Edit Record Modal -->
-    <div id="formModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-40 hidden flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border w-full max-w-3xl overflow-hidden shrink-0">
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-6 py-4 border-b flex justify-between items-center">
-                <h3 id="modalTitle" class="text-lg font-bold">新增记录</h3>
-                <button onclick="closeFormModal()" style="color: var(--text-sub);">
+    <div id="formModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden shrink-0">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold text-slate-900">新增记录</h3>
+                <button onclick="closeFormModal()" class="text-slate-400 hover:text-slate-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             <form id="recordForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-5">
                 <input type="hidden" id="recordId">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">订单号</label><input type="text" id="orderNum" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">下单时间 *</label><input type="text" id="orderTime" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">签收时间</label><input type="text" id="receivedTime" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">订单号</label><input type="text" id="orderNum" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">下单时间 *</label><input type="text" id="orderTime" required class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">签收时间</label><input type="text" id="receivedTime" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">产品名称 *</label><input type="text" id="productName" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">描述/规格</label><input type="text" id="description" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">产品名称 *</label><input type="text" id="productName" required class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">描述/规格</label><input type="text" id="description" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                 </div>
-                <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border">
+                <div class="bg-slate-50 border-slate-200/80 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border">
                     <div>
-                        <label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">价格 (¥)</label>
-                        <div class="relative"><span style="color: var(--text-sub);" class="absolute left-3 top-1/2 -translate-y-1/2">¥</span><input type="number" step="0.01" id="priceRMB" oninput="autoConvertCurrency()" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-8 pr-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">价格 (¥)</label>
+                        <div class="relative"><span class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-sm">¥</span><input type="number" step="0.01" id="priceRMB" oninput="autoConvertCurrency()" class="w-full pl-8 pr-3 py-2 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                     </div>
                     <div>
-                        <label style="color: var(--text-sub);" class="block text-xs font-semibold uppercase mb-1">价格 (RM) *</label>
-                        <div class="relative"><span style="color: var(--text-sub);" class="absolute left-3 top-1/2 -translate-y-1/2">RM</span><input type="number" step="0.01" id="priceMYR" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full pl-10 pr-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">价格 (RM) *</label>
+                        <div class="relative"><span class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-sm">RM</span><input type="number" step="0.01" id="priceMYR" required class="w-full pl-10 pr-3 py-2 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                     </div>
                 </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border-t border-slate-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="flex items-center gap-1 text-xs font-medium mb-1 text-purple-400">
+                        <label class="flex items-center gap-1 text-xs font-semibold mb-1 text-teal-600">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
                             中国快递 (CN)
                         </label>
-                        <input type="text" id="cnCourier" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                        <input type="text" id="cnCourier" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                     </div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-medium mb-1">中国单号</label><input type="text" id="cnTracking" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-sans focus:ring-2 focus:ring-pink-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 mb-1">中国单号</label><input type="text" id="cnTracking" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl font-sans outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                 </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border-t border-slate-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="flex items-center gap-1 text-xs font-medium mb-1 text-pink-400">
+                        <label class="flex items-center gap-1 text-xs font-semibold mb-1 text-blue-600">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
                             大马快递 (MY)
                         </label>
-                        <input type="text" id="myCourier" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                        <input type="text" id="myCourier" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
                     </div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-medium mb-1">大马单号 (集包自动高亮)</label><input type="text" id="myTracking" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl font-sans focus:ring-2 focus:ring-pink-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 mb-1">大马单号 (集包自动高亮)</label><input type="text" id="myTracking" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl font-sans outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                 </div>
-                <div style="border-color: var(--border-color);" class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">备注</label><input type="text" id="remarks" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
-                    <div><label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">其他</label><input type="text" id="other" style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></div>
+                <div class="border-t border-slate-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-semibold text-slate-500 mb-1">备注</label><input type="text" id="remarks" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
+                    <div><label class="block text-xs font-semibold text-slate-500 mb-1">其他</label><input type="text" id="other" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"></div>
                 </div>
-                <div style="border-color: var(--border-color);" class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" onclick="closeFormModal()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-5 py-2.5 rounded-xl text-sm border">取消</button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl text-sm text-white bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 shadow-md font-medium inline-flex items-center gap-1.5">
-                        <!-- Heroicon v1 outline: cloud-upload -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeFormModal()" class="px-5 py-2.5 rounded-xl text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">取消</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl text-sm text-white bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 shadow-sm font-semibold inline-flex items-center gap-1.5 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                         保存上传至云端
                     </button>
@@ -406,36 +398,34 @@
     </div>
 
     <!-- Mark Received Modal -->
-    <div id="markReceivedModal" style="background-color: var(--modal-overlay);" class="fixed inset-0 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div style="background-color: var(--bg-card); border-color: var(--border-color);" class="rounded-2xl shadow-2xl border max-w-md w-full p-6 space-y-4">
-            <h3 class="font-bold flex items-center gap-2">
-                <!-- Heroicon v1 outline: check-circle -->
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div id="markReceivedModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 确定标记签收此商品？
             </h3>
-            <div style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-3.5 rounded-xl text-xs space-y-1 border">
-                <div class="flex justify-between"><span>订单号:</span><span id="markPreviewOrderNum" class="font-mono">-</span></div>
-                <div class="flex justify-between"><span>名称:</span><span id="markPreviewProductName" class="font-bold">-</span></div>
-                <div id="markBundledNotice" class="hidden text-[11px] text-pink-500 bg-violet-500/10 p-2 rounded-lg mt-1 border border-pink-500/30 flex items-center gap-1.5">
-                    <!-- Heroicon v1 outline: collection -->
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-1.5 border border-slate-200/80 text-slate-700">
+                <div class="flex justify-between"><span class="text-slate-400">订单号:</span><span id="markPreviewOrderNum" class="font-mono font-semibold">-</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">名称:</span><span id="markPreviewProductName" class="font-bold text-slate-900">-</span></div>
+                <div id="markBundledNotice" class="hidden text-[11px] text-teal-700 bg-teal-50 p-2 rounded-lg mt-1 border border-teal-200 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span>包含同单号集包，将自动一并签收关联包裹。</span>
                 </div>
             </div>
             <div>
-                <label style="color: var(--text-sub);" class="block text-xs font-semibold mb-1">签收日期与时间</label>
-                <input type="text" id="markReceivedDateTimeInput" required style="background-color: var(--bg-input); border-color: var(--border-color);" class="w-full px-3 py-2.5 text-sm border rounded-xl font-mono focus:ring-2 focus:ring-pink-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">签收日期与时间</label>
+                <input type="text" id="markReceivedDateTimeInput" required class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
             </div>
             <div class="flex justify-end gap-3 pt-2">
-                <button onclick="closeMarkReceivedModal()" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="px-4 py-2 rounded-xl text-xs border">取消</button>
-                <button onclick="confirmMarkReceived()" class="px-5 py-2 rounded-xl text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-medium">确认签收</button>
+                <button onclick="closeMarkReceivedModal()" class="px-4 py-2 rounded-xl text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">取消</button>
+                <button onclick="confirmMarkReceived()" class="px-5 py-2 rounded-xl text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-semibold shadow-sm transition-all">确认签收</button>
             </div>
         </div>
     </div>
 
-    <!-- Settings Modal (汇率设置与云同步账号) -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm p-6 space-y-5">
+    <!-- Settings Modal (汇率设置、云同步账号与导入/导出备份) -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm p-6 space-y-5 my-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
                     <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
@@ -602,21 +592,16 @@
 
         document.addEventListener('DOMContentLoaded', () => { 
             initFlatpickrPickers(); 
-            startLiveClock();
             document.getElementById('exchangeRateInput').value = window.RMB_TO_MYR_RATE;
         });
 
-        /* --- 1. 顶栏本地时间实时显示 --- */
-        function startLiveClock() {
-            const el = document.getElementById('liveClockText');
-            if (!el) return;
-            const update = () => {
-                const now = new Date();
-                const pad = n => String(n).padStart(2, '0');
-                el.innerText = `本地时间: ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-            };
-            update();
-            setInterval(update, 1000);
+        /* --- 1. 设置弹窗内备份面板折叠切换 --- */
+        function toggleBackupSection() {
+            const body = document.getElementById('backupSectionBody');
+            const icon = document.getElementById('backupChevronIcon');
+            if (!body || !icon) return;
+            const isHidden = body.classList.toggle('hidden');
+            icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
         /* --- 2. 汇率设置逻辑 --- */
@@ -660,7 +645,6 @@
         }
 
         function updateSelectionUI() {
-            // 清理已不存在的 ID
             const validIds = new Set(window.records.map(r => r.id));
             for (let id of selectedIds) {
                 if (!validIds.has(id)) selectedIds.delete(id);
@@ -776,11 +760,10 @@
             document.getElementById('detailMyTracking').innerText = r.myTracking || '未录入';
             document.getElementById('detailRemarks').innerText = r.remarks || '无';
 
-            // 动态渲染底部“标记签收 / 撤销签收”按钮
             const rec = !!(r.receivedTime && String(r.receivedTime).trim());
             const toggleBtn = document.getElementById('detailToggleReceiveBtn');
             if (rec) {
-                toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5 border border-amber-500/40 bg-amber-500/15 text-amber-500 hover:bg-amber-500 hover:text-white";
+                toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5 border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white";
                 toggleBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>撤销签收`;
             } else {
                 toggleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white";
@@ -829,12 +812,12 @@
             const t1 = document.getElementById('navTab1'), t2 = document.getElementById('navTab2');
             if (pageName === 'records') {
                 pr.classList.remove('hidden'); pa.classList.add('hidden');
-                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5";
-                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all opacity-80 hover:opacity-100 border border-[var(--border-color)] inline-flex items-center gap-1.5";
+                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-teal-700 shadow-sm inline-flex items-center gap-1.5";
+                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-white/90 hover:bg-white/15 inline-flex items-center gap-1.5";
             } else {
                 pr.classList.add('hidden'); pa.classList.remove('hidden');
-                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all opacity-80 hover:opacity-100 border border-[var(--border-color)] inline-flex items-center gap-1.5";
-                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-purple-500/20 inline-flex items-center gap-1.5";
+                t1.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-white/90 hover:bg-white/15 inline-flex items-center gap-1.5";
+                t2.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-teal-700 shadow-sm inline-flex items-center gap-1.5";
                 renderMonthlyChart();
             }
         }
@@ -875,11 +858,11 @@
                 map[t] = { 
                     count: counts[t], 
                     badge: y 
-                        ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' 
-                        : 'bg-gradient-to-r from-rose-500 to-indigo-500 text-white', 
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white' 
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white', 
                     style: y 
-                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-500' 
-                        : 'bg-rose-500/10 border-rose-500/40 text-rose-500' 
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                        : 'bg-blue-50 border-blue-200 text-blue-700' 
                 };
             });
             return { map, total: dupes.length };
@@ -912,45 +895,42 @@
                     const hl = map[(r.myTracking || '').trim()];
                     const isChecked = selectedIds.has(r.id);
                     const tr = document.createElement('tr');
-                    tr.style.borderColor = "var(--border-color)";
-                    tr.className = `${isChecked ? 'bg-violet-500/10' : ''} hover:bg-violet-500/10 border-b transition-colors`;
+                    tr.className = `${isChecked ? 'bg-teal-50/70' : ''} hover:bg-slate-50/80 border-b border-slate-100 transition-colors`;
                     
                     tr.innerHTML = `
                         <td class="px-5 py-4">
-                            <div class="font-medium text-xs font-bold flex gap-1"><span>${r.orderNum||'无'}</span></div>
-                            <div style="color: var(--text-sub);" class="text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div>
-                            <!-- 在订单号下方增加一行，左侧放置多选复选框 -->
-                            <div class="mt-2 pt-1.5 border-t border-dashed" style="border-color: var(--border-color);">
+                            <div class="text-xs font-bold text-slate-900 flex gap-1"><span>${r.orderNum||'无'}</span></div>
+                            <div class="text-slate-400 text-[11px] font-sans mt-1">${formatDisplayDateTime(r.orderTime)}</div>
+                            <div class="mt-2 pt-1.5 border-t border-dashed border-slate-200">
                                 <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRowSelect('${r.id}', this.checked)" class="w-4 h-4 rounded accent-pink-500 cursor-pointer">
-                                    <span style="color: var(--text-sub);" class="text-[11px]">选择</span>
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRowSelect('${r.id}', this.checked)" class="w-4 h-4 rounded accent-teal-600 cursor-pointer">
+                                    <span class="text-slate-500 text-[11px]">选择</span>
                                 </label>
                             </div>
                         </td>
-                        <td class="px-5 py-4"><div class="font-semibold">${r.productName||''}</div><div style="color: var(--text-sub);" class="text-xs max-w-xs truncate">${r.description||''}</div></td>
-                        <td class="px-5 py-4 text-right"><div class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500">RM ${parseFloat(r.priceMYR||0).toFixed(2)}</div><div style="color: var(--text-sub);" class="text-xs font-sans">¥ ${r.priceRMB||'-'}</div></td>
-                        <td class="px-5 py-4"><div class="text-xs font-medium">${r.cnCourier||'-'}</div><div style="color: var(--text-sub);" class="text-xs mt-1 font-sans">${r.cnTracking||'-'}</div></td>
+                        <td class="px-5 py-4"><div class="font-semibold text-slate-900">${r.productName||''}</div><div class="text-slate-400 text-xs max-w-xs truncate mt-0.5">${r.description||''}</div></td>
+                        <td class="px-5 py-4 text-right"><div class="font-extrabold text-teal-600">RM ${parseFloat(r.priceMYR||0).toFixed(2)}</div><div class="text-slate-400 text-xs font-sans mt-0.5">¥ ${r.priceRMB||'-'}</div></td>
+                        <td class="px-5 py-4"><div class="text-xs font-medium text-slate-800">${r.cnCourier||'-'}</div><div class="text-slate-400 text-xs mt-1 font-sans">${r.cnTracking||'-'}</div></td>
                         <td class="px-5 py-4">
-                            <div class="text-xs font-medium">${r.myCourier||'-'}</div>
-                            <div style="border-color: var(--border-color);" class="text-xs mt-1 font-medium ${hl?hl.style:''} px-1.5 py-0.5 rounded inline-block border">${r.myTracking||'未录入'}</div>
+                            <div class="text-xs font-medium text-slate-800">${r.myCourier||'-'}</div>
+                            <div class="text-xs mt-1 font-medium ${hl ? hl.style : 'bg-slate-50 border-slate-200 text-slate-700'} px-1.5 py-0.5 rounded inline-block border">${r.myTracking||'未录入'}</div>
                             ${hl ? `<div class="mt-1"><span class="${hl.badge} text-[10px] font-bold px-2 py-0.5 rounded-full badge-pulse shadow-sm inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>集包 (${hl.count}件)</span></div>` : ''}
                         </td>
                         <td class="px-5 py-4">
                             ${rec 
                                 ? `<div class="flex items-center gap-1.5">
-                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>已签收</span>
-                                       <button onclick="unmarkReceived('${r.id}')" title="撤销签收" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-1 rounded-lg border hover:border-amber-500 text-amber-500 transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>已签收</span>
+                                       <button onclick="unmarkReceived('${r.id}')" title="撤销签收" class="p-1 rounded-lg bg-slate-50 border border-slate-200 hover:border-amber-400 text-amber-500 transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
                                    </div>
-                                   <div style="color: var(--text-sub);" class="text-[11px] mt-1">${formatDisplayDateTime(r.receivedTime)}</div>` 
+                                   <div class="text-slate-400 text-[11px] mt-1">${formatDisplayDateTime(r.receivedTime)}</div>` 
                                 : `<div class="flex items-center gap-1.5">
-                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>待签收</span>
-                                       <button onclick="openMarkReceivedModal('${r.id}')" title="标记签收" class="p-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></button>
+                                       <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>待签收</span>
+                                       <button onclick="openMarkReceivedModal('${r.id}')" title="标记签收" class="p-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></button>
                                    </div>`}
                         </td>
-                        <td class="px-5 py-4 text-center text-xs font-medium">${rec ? `用时 ${calculateDeliveryDays(r.orderTime, r.receivedTime)} 天` : `已等 ${calculateDeliveryDays(r.orderTime, null)} 天`}</td>
+                        <td class="px-5 py-4 text-center text-xs font-medium text-slate-600">${rec ? `用时 ${calculateDeliveryDays(r.orderTime, r.receivedTime)} 天` : `已等 ${calculateDeliveryDays(r.orderTime, null)} 天`}</td>
                         <td class="px-5 py-4 text-center">
-                            <!-- 精简为单个三点按钮 (Heroicon v1 outline: dots-vertical) -->
-                            <button onclick="openRowActionMenu(event, '${r.id}')" title="更多操作" style="background-color: var(--bg-sub); border-color: var(--border-color);" class="p-2 rounded-xl border hover:border-pink-500 transition-colors inline-flex items-center justify-center">
+                            <button onclick="openRowActionMenu(event, '${r.id}')" title="更多操作" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 hover:border-teal-500 hover:text-teal-600 transition-colors inline-flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                             </button>
                         </td>
@@ -964,7 +944,7 @@
             let myr=0, rmb=0, p=0, r=0;
             window.records.forEach(x => { myr+=parseFloat(x.priceMYR||0); rmb+=parseFloat(x.priceRMB||0); (x.receivedTime && String(x.receivedTime).trim()) ? r++ : p++; });
             document.getElementById('statTotalMYR').innerText = `RM ${myr.toFixed(2)}`;
-            document.getElementById('statTotalRMB').innerText = `¥ ${rmb.toFixed(2)}`;
+            document.getElementById('statTotalRMB').innerText = `折合人民币 ¥ ${rmb.toFixed(2)}`;
             document.getElementById('statTotalItems').innerText = window.records.length;
             document.getElementById('statPendingItems').innerText = p;
             document.getElementById('statReceivedItems').innerText = r;
@@ -983,18 +963,17 @@
             const ctx = document.getElementById('monthlyExpenseChart').getContext('2d');
             if(expenseChartInstance) expenseChartInstance.destroy();
             
-            const isDark = document.documentElement.classList.contains('dark');
             expenseChartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: labels.length?labels:['暂无'], datasets: [{ label: '月度总支出 (RM)', data: data.length?data:[0], backgroundColor: '#8B5CF6', borderRadius: 8 }] },
+                data: { labels: labels.length?labels:['暂无'], datasets: [{ label: '月度总支出 (RM)', data: data.length?data:[0], backgroundColor: '#0D9488', borderRadius: 8 }] },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
                     scales: {
-                        x: { ticks: { color: isDark ? '#94A3B8' : '#64748B' }, grid: { color: isDark ? 'rgba(49, 46, 129, 0.3)' : 'rgba(226, 232, 240, 0.8)' } },
-                        y: { ticks: { color: isDark ? '#94A3B8' : '#64748B' }, grid: { color: isDark ? 'rgba(49, 46, 129, 0.3)' : 'rgba(226, 232, 240, 0.8)' } }
+                        x: { ticks: { color: '#64748B' }, grid: { color: 'rgba(226, 232, 240, 0.8)' } },
+                        y: { ticks: { color: '#64748B' }, grid: { color: 'rgba(226, 232, 240, 0.8)' } }
                     },
-                    plugins: { legend: { labels: { color: isDark ? '#E2E8F0' : '#1E1B4B' } } }
+                    plugins: { legend: { labels: { color: '#1E293B' } } }
                 }
             });
         }
@@ -1092,18 +1071,7 @@
             return `${dd}${mm}${yyyy}_${hh}${min}${ss}`;
         }
 
-        function toggleExportMenu() {
-            document.getElementById('exportMenu').classList.toggle('hidden');
-        }
-
         document.addEventListener('click', function(event) {
-            // 关闭导出下拉菜单
-            const menu = document.getElementById('exportMenu');
-            const button = event.target.closest('button[onclick="toggleExportMenu()"]');
-            if (!button && menu && !menu.classList.contains('hidden')) {
-                menu.classList.add('hidden');
-            }
-
             // 关闭表格三点操作下拉菜单
             const rowMenu = document.getElementById('rowActionMenu');
             const rowBtn = event.target.closest('button[onclick^="openRowActionMenu"]');
@@ -1170,7 +1138,6 @@
                 }
 
                 try {
-                    // 确保每条记录都有 id，防止多选或编辑异常
                     window.records = importedRecords.map((item, idx) => ({
                         ...item,
                         id: item.id ? String(item.id) : `${Date.now()}_${idx}`
@@ -1188,6 +1155,10 @@
                         window.saveRecords();
                     }
 
+                    if (typeof closeSettingsModal === 'function') {
+                        closeSettingsModal();
+                    }
+
                     window.showToast(`成功导入 ${window.records.length} 条记录！`, "success");
                 } catch (renderErr) {
                     console.error("导入后渲染或同步错误:", renderErr);
@@ -1197,14 +1168,15 @@
             reader.readAsText(file, 'UTF-8');
             event.target.value = '';
         };
+
         window.showToast = function(msg, type='info') {
             const c = document.getElementById('toastContainer'), t = document.createElement('div');
-            t.className = `px-4 py-3 rounded-xl shadow-2xl border text-sm text-white transition-all transform translate-y-2 opacity-0 flex items-center gap-2 ${type==='success'?'bg-gradient-to-r from-violet-900 to-pink-900 border-pink-500/50':type==='error'?'bg-red-950 border-red-800/80':'bg-indigo-950 border-indigo-800/80'}`;
+            t.className = `px-4 py-3 rounded-xl shadow-xl border text-sm text-white transition-all transform translate-y-2 opacity-0 flex items-center gap-2 ${type==='success'?'bg-gradient-to-r from-emerald-700 to-teal-700 border-emerald-500/50':type==='error'?'bg-rose-800 border-rose-600/80':'bg-slate-800 border-slate-700'}`;
             const icon = type === 'success' 
-                ? `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                ? `<svg class="w-4 h-4 text-emerald-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
                 : type === 'error'
-                ? `<svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                : `<svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                ? `<svg class="w-4 h-4 text-rose-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                : `<svg class="w-4 h-4 text-sky-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
             t.innerHTML = `${icon}<span>${msg}</span>`; c.appendChild(t);
             setTimeout(()=>t.classList.remove('translate-y-2','opacity-0'),10); 
             setTimeout(()=>{t.classList.add('opacity-0'); setTimeout(()=>t.remove(),300);}, 3000);
